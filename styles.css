@@ -95,22 +95,7 @@ body {
   font-size: var(--text-base);
   line-height: 1.5;
   color: #1f2937;
-  background: linear-gradient(
-    135deg,
-    var(--gradient-start) 0%,
-    var(--gradient-end) 25%,
-    var(--gradient-start) 50%,
-    var(--gradient-end) 75%,
-    var(--gradient-start) 100%
-  );
-  background-size: 200% 200%;
-  animation: bg-gradient-shift 7s ease-in-out infinite;
   min-height: 100vh;
-}
-
-@keyframes bg-gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
 }
 
 .app {
