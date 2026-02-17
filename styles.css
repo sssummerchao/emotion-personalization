@@ -41,41 +41,41 @@
   --gradient-accent: #ea580c;
 }
 
-/* Color scheme overrides */
+/* Color scheme overrides — more saturated, distinguishable hues */
 [data-scheme="pink"] {
-  --gradient-start: #fbcfe8;
-  --gradient-end: #c026d3;
-  --gradient-accent: #a21caf;
+  --gradient-start: #ff78c8;
+  --gradient-end: #ff00c8;
+  --gradient-accent: #c700a0;
 }
 
 [data-scheme="blue"] {
-  --gradient-start: #bae6fd;
-  --gradient-end: #0284c7;
-  --gradient-accent: #0369a1;
+  --gradient-start: #50b4ff;
+  --gradient-end: #0064dc;
+  --gradient-accent: #004da0;
 }
 
 [data-scheme="green"] {
-  --gradient-start: #bbf7d0;
-  --gradient-end: #15803d;
-  --gradient-accent: #166534;
+  --gradient-start: #50e68c;
+  --gradient-end: #00b450;
+  --gradient-accent: #008c40;
 }
 
 [data-scheme="orange"] {
-  --gradient-start: #fef08a;
-  --gradient-end: #fb923c;
-  --gradient-accent: #ea580c;
+  --gradient-start: #ffc850;
+  --gradient-end: #ff7800;
+  --gradient-accent: #e55a00;
 }
 
 [data-scheme="purple"] {
-  --gradient-start: #e9d5ff;
-  --gradient-end: #6b21a8;
-  --gradient-accent: #581c87;
+  --gradient-start: #c878ff;
+  --gradient-end: #7800c8;
+  --gradient-accent: #5a00a0;
 }
 
 [data-scheme="red"] {
-  --gradient-start: #fecaca;
-  --gradient-end: #b91c1c;
-  --gradient-accent: #991b1b;
+  --gradient-start: #ff6464;
+  --gradient-end: #dc0000;
+  --gradient-accent: #a80000;
 }
 
 /* ============================================
@@ -95,9 +95,22 @@ body {
   font-size: var(--text-base);
   line-height: 1.5;
   color: #1f2937;
-  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--gradient-start) 0%,
+    var(--gradient-end) 25%,
+    var(--gradient-start) 50%,
+    var(--gradient-end) 75%,
+    var(--gradient-start) 100%
+  );
+  background-size: 200% 200%;
+  animation: bg-gradient-shift 7s ease-in-out infinite;
   min-height: 100vh;
-  transition: background 0.4s ease;
+}
+
+@keyframes bg-gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 .app {
@@ -242,14 +255,34 @@ body {
   width: 100%;
   height: 100%;
   border-radius: var(--radius-sm);
+  background-size: 200% 100%;
+  animation: gradient-shift 3.5s ease-in-out infinite;
 }
 
-.gradient-pink { background: linear-gradient(135deg, #fbcfe8, #c026d3); }
-.gradient-blue { background: linear-gradient(135deg, #bae6fd, #0284c7); }
-.gradient-green { background: linear-gradient(135deg, #bbf7d0, #15803d); }
-.gradient-orange { background: linear-gradient(135deg, #fef08a, #fb923c); }
-.gradient-purple { background: linear-gradient(135deg, #e9d5ff, #6b21a8); }
-.gradient-red { background: linear-gradient(135deg, #fecaca, #b91c1c); }
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Light → saturated → light gradient (matches device transition) */
+.gradient-pink {
+  background: linear-gradient(90deg, #ff78c8 0%, #ff00c8 25%, #ff78c8 50%, #ff00c8 75%, #ff78c8 100%);
+}
+.gradient-blue {
+  background: linear-gradient(90deg, #50b4ff 0%, #0064dc 25%, #50b4ff 50%, #0064dc 75%, #50b4ff 100%);
+}
+.gradient-green {
+  background: linear-gradient(90deg, #50e68c 0%, #00b450 25%, #50e68c 50%, #00b450 75%, #50e68c 100%);
+}
+.gradient-orange {
+  background: linear-gradient(90deg, #ffc850 0%, #ff7800 25%, #ffc850 50%, #ff7800 75%, #ffc850 100%);
+}
+.gradient-purple {
+  background: linear-gradient(90deg, #c878ff 0%, #7800c8 25%, #c878ff 50%, #7800c8 75%, #c878ff 100%);
+}
+.gradient-red {
+  background: linear-gradient(90deg, #ff6464 0%, #dc0000 25%, #ff6464 50%, #dc0000 75%, #ff6464 100%);
+}
 
 /* ============================================
    Music Player

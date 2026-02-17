@@ -70,10 +70,13 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing emotion or colorScheme' });
   }
 
+  // Track: send both ID (0001) and number (1) for DFPlayer play(n)
+  const trackNum = selectedTrack ? parseInt(selectedTrack, 10) || 1 : 1;
   const arg = JSON.stringify({
     e: emotion,
     c: colorScheme,
     t: selectedTrack || '',
+    n: trackNum,
     m: motorSpeed ?? 50,
   });
 

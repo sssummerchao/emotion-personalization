@@ -128,6 +128,7 @@ function initEmotionToggle() {
       btn.setAttribute('aria-pressed', 'true');
       state.emotion = btn.dataset.emotion;
       applyStateToUI();
+      syncToPhoton(state.emotion);  // sync the newly selected emotion to device
     });
   });
 }
