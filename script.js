@@ -62,6 +62,26 @@ function getCurrentState() {
 function setCurrentState(updates) {
   Object.assign(state[state.emotion], updates);
   saveToStorage();
+  syncToPhoton(state.emotion);
+}
+
+function syncToPhoton(emotion) {
+  const s = state[emotion];
+  const payload = {
+    emotion,
+    colorScheme: s.colorScheme,
+    selectedTrack: s.selectedTrack || '',
+    motorSpeed: s.motorSpeed,
+  };
+  fetch('/api/photon', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+    .then((r) => {
+      if (!r.ok) return r.json().then((d) => Promise.reject(d));
+    })
+    .catch((err) => console.warn('Photon sync failed:', err?.error || err));
 }
 
 function init() {
@@ -70,8 +90,10 @@ function init() {
   initColorSwitcher();
   initMusicPlayer();
   initMotorSlider();
-  // Apply initial state to UI
   applyStateToUI();
+  // Sync saved state to Photon on load
+  syncToPhoton('positive');
+  syncToPhoton('negative');
 }
 
 function applyStateToUI() {
