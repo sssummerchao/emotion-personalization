@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photon Control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1 class="logo">Photon</h1>
+      <p class="tagline">Emotion & Environment Control</p>
+    </header>
+
+    <main class="main">
+      <!-- Emotion State -->
+      <section class="card emotion-section">
+        <h2 class="section-title">Emotion State</h2>
+        <p class="emotion-hint">Each state remembers its own color, music & speed</p>
+        <div class="emotion-toggle">
+          <button type="button" class="emotion-btn active" data-emotion="positive" aria-pressed="true">
+            <span class="emotion-icon">✦</span>
+            Positive
+          </button>
+          <button type="button" class="emotion-btn" data-emotion="negative" aria-pressed="false">
+            <span class="emotion-icon">○</span>
+            Negative
+          </button>
+        </div>
+      </section>
+
+      <!-- Light Color Switcher -->
+      <section class="card color-section">
+        <h2 class="section-title">Light Color</h2>
+        <div class="color-schemes">
+          <button type="button" class="color-btn" data-scheme="pink" title="Pink / Magenta" aria-label="Pink Magenta gradient">
+            <span class="color-preview gradient-pink"></span>
+          </button>
+          <button type="button" class="color-btn" data-scheme="blue" title="Baby Blue / Ocean Blue" aria-label="Blue ocean gradient">
+            <span class="color-preview gradient-blue"></span>
+          </button>
+          <button type="button" class="color-btn" data-scheme="green" title="Light Green / Forest Green" aria-label="Green forest gradient">
+            <span class="color-preview gradient-green"></span>
+          </button>
+          <button type="button" class="color-btn active" data-scheme="orange" title="Yellow / Orange" aria-label="Yellow orange gradient">
+            <span class="color-preview gradient-orange"></span>
+          </button>
+          <button type="button" class="color-btn" data-scheme="purple" title="Light Purple / Dark Purple" aria-label="Purple gradient">
+            <span class="color-preview gradient-purple"></span>
+          </button>
+          <button type="button" class="color-btn" data-scheme="red" title="Light Red / Dark Red" aria-label="Red gradient">
+            <span class="color-preview gradient-red"></span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Music Player -->
+      <section class="card music-section">
+        <h2 class="section-title">Sound Tracks</h2>
+        <p class="music-hint">Tap track to select • Tap ▶ to play preview</p>
+        <div class="track-list">
+          <div class="track" data-track="0001">
+            <button type="button" class="track-play" aria-label="Play Bird">
+              <span class="play-icon">▶</span>
+            </button>
+            <div class="track-info">
+              <span class="track-id">0001</span>
+              <span class="track-label">Bird</span>
+            </div>
+          </div>
+          <div class="track" data-track="0003">
+            <button type="button" class="track-play" aria-label="Play Crowd noise">
+              <span class="play-icon">▶</span>
+            </button>
+            <div class="track-info">
+              <span class="track-id">0003</span>
+              <span class="track-label">Crowd noise</span>
+            </div>
+          </div>
+          <div class="track" data-track="0005">
+            <button type="button" class="track-play" aria-label="Play Forest">
+              <span class="play-icon">▶</span>
+            </button>
+            <div class="track-info">
+              <span class="track-id">0005</span>
+              <span class="track-label">Forest</span>
+            </div>
+          </div>
+          <div class="track" data-track="0007">
+            <button type="button" class="track-play" aria-label="Play Static noise">
+              <span class="play-icon">▶</span>
+            </button>
+            <div class="track-info">
+              <span class="track-id">0007</span>
+              <span class="track-label">Static noise</span>
+            </div>
+          </div>
+          <div class="track" data-track="0009">
+            <button type="button" class="track-play" aria-label="Play Hitting">
+              <span class="play-icon">▶</span>
+            </button>
+            <div class="track-info">
+              <span class="track-id">0009</span>
+              <span class="track-label">Hitting</span>
+            </div>
+          </div>
+          <div class="track" data-track="00011">
+            <button type="button" class="track-play" aria-label="Play River">
+              <span class="play-icon">▶</span>
+            </button>
+            <div class="track-info">
+              <span class="track-id">00011</span>
+              <span class="track-label">River</span>
+            </div>
+          </div>
+          <div class="track" data-track="00013">
+            <button type="button" class="track-play" aria-label="Play Rain">
+              <span class="play-icon">▶</span>
+            </button>
+            <div class="track-info">
+              <span class="track-id">00013</span>
+              <span class="track-label">Rain</span>
+            </div>
+          </div>
+          <div class="track" data-track="00015">
+            <button type="button" class="track-play" aria-label="Play Drilling">
+              <span class="play-icon">▶</span>
+            </button>
+            <div class="track-info">
+              <span class="track-id">00015</span>
+              <span class="track-label">Drilling</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Motor Speed -->
+      <section class="card motor-section">
+        <h2 class="section-title">Motor Speed</h2>
+        <div class="motor-control">
+          <div class="slider-labels">
+            <span>Fast</span>
+            <span>Slow</span>
+          </div>
+          <input type="range" class="motor-slider" min="0" max="100" value="50" aria-label="Motor speed from fast to slow">
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Photon v1 — Ready for Vercel</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
