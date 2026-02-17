@@ -24,7 +24,33 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid JSON body' });
     }
   }
-  const { emotion, colorScheme, selectedTrack, motorSpeed } = body || {};
+  const { action, emotion, colorScheme, selectedTrack, motorSpeed } = body || {};
+
+  if (action === 'save') {
+    const arg = JSON.stringify({ save: true });
+    try {
+      const resp = await fetch(
+        `https://api.particle.io/v1/devices/${deviceId}/setState`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ access_token: token, arg }),
+        }
+      );
+      const data = await resp.json();
+      if (!resp.ok) {
+        return res.status(resp.status).json({
+          error: data.error || 'Particle API error',
+          details: data,
+        });
+      }
+      return res.status(200).json({ ok: true, saved: true });
+    } catch (err) {
+      console.error('Photon save error:', err);
+      return res.status(500).json({ error: 'Failed to reach Particle cloud' });
+    }
+  }
+
   if (!emotion || !colorScheme) {
     return res.status(400).json({ error: 'Missing emotion or colorScheme' });
   }

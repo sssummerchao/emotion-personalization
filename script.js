@@ -90,10 +90,11 @@ function init() {
   initColorSwitcher();
   initMusicPlayer();
   initMotorSlider();
+  initSaveButton();
   applyStateToUI();
-  // Sync saved state to Photon on load
-  syncToPhoton('positive');
+  // Sync saved state to Photon on load (shows live preview; last sync wins for display)
   syncToPhoton('negative');
+  syncToPhoton('positive');
 }
 
 function applyStateToUI() {
@@ -210,6 +211,36 @@ function stopAudio() {
     audioElement.currentTime = 0;
     audioElement.src = '';
   }
+}
+
+// --- Save to Device ---
+function initSaveButton() {
+  const btn = document.getElementById('save-to-device');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    fetch('/api/photon', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'save' }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        btn.textContent = data.ok ? 'Saved!' : 'Failed';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.textContent = 'Save to Device';
+        }, 2000);
+      })
+      .catch(() => {
+        btn.textContent = 'Failed';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.textContent = 'Save to Device';
+        }, 2000);
+      });
+  });
 }
 
 // --- Motor Slider ---
