@@ -37,10 +37,11 @@ export default async function handler(req, res) {
           body: new URLSearchParams({ access_token: token, arg }),
         }
       );
-      const data = await resp.json();
+      const data = await resp.json().catch(() => ({}));
       if (!resp.ok) {
+        const errMsg = data.error_description || data.error || `Particle API error (${resp.status})`;
         return res.status(resp.status).json({
-          error: data.error || 'Particle API error',
+          error: errMsg,
           details: data,
         });
       }
@@ -75,10 +76,11 @@ export default async function handler(req, res) {
       }
     );
 
-    const data = await resp.json();
+    const data = await resp.json().catch(() => ({}));
     if (!resp.ok) {
+      const errMsg = data.error_description || data.error || `Particle API error (${resp.status})`;
       return res.status(resp.status).json({
-        error: data.error || 'Particle API error',
+        error: errMsg,
         details: data,
       });
     }

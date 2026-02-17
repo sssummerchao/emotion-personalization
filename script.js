@@ -216,29 +216,53 @@ function stopAudio() {
 // --- Save to Device ---
 function initSaveButton() {
   const btn = document.getElementById('save-to-device');
+  const errEl = document.getElementById('save-error');
   if (!btn) return;
+
+  function showError(msg) {
+    if (errEl) {
+      errEl.textContent = msg;
+      errEl.hidden = false;
+    }
+  }
+  function clearError() {
+    if (errEl) {
+      errEl.textContent = '';
+      errEl.hidden = true;
+    }
+  }
+
   btn.addEventListener('click', () => {
     btn.disabled = true;
+    clearError();
     btn.textContent = 'Saving…';
     fetch('/api/photon', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'save' }),
     })
-      .then((r) => r.json())
+      .then((r) => r.json().catch(() => ({})))
       .then((data) => {
-        btn.textContent = data.ok ? 'Saved!' : 'Failed';
+        if (data.ok) {
+          btn.textContent = 'Saved!';
+          clearError();
+        } else {
+          btn.textContent = 'Failed';
+          const msg = data.error || data.details?.error_description || JSON.stringify(data);
+          showError(msg);
+        }
         setTimeout(() => {
           btn.disabled = false;
           btn.textContent = 'Save to Device';
-        }, 2000);
+        }, 3000);
       })
-      .catch(() => {
+      .catch((err) => {
         btn.textContent = 'Failed';
+        showError(err?.message || 'Network error — check console');
         setTimeout(() => {
           btn.disabled = false;
           btn.textContent = 'Save to Device';
-        }, 2000);
+        }, 3000);
       });
   });
 }

@@ -22,6 +22,19 @@ The web app syncs color, music, and motor settings to your Particle device. Set 
 
 Flash the updated firmware to your device so it has the `setState` cloud function.
 
+## Troubleshooting
+
+If **Save to Device** shows "Failed", check the red error message below the button:
+
+| Error | Fix |
+|-------|-----|
+| *Server not configured...* | Add `PARTICLE_ACCESS_TOKEN` and `PARTICLE_DEVICE_ID` in Vercel → Settings → Environment Variables, then redeploy |
+| *Device not found* or *404* | Wrong Device ID — get it from [console.particle.io](https://console.particle.io) → Devices |
+| *timed_out* or *503* | Device offline or sleeping — ensure it's powered and connected to Wi‑Fi; check [console.particle.io](https://console.particle.io) for status |
+| *invalid_grant* or *unauthorized* | Token expired or invalid — create a new token and update Vercel env vars |
+| *Function setState not found* | Flash the updated firmware; the device needs the new code with `Particle.function("setState", ...)` |
+| *Network error* or *Failed to fetch* | Test on your **deployed Vercel URL** — the API only works when the app is live on Vercel, not when opened locally |
+
 ## Deploy to Vercel
 
 1. Push this `web` folder to a GitHub repo (or create a new repo with just the web files)
