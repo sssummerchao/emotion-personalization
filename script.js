@@ -59,19 +59,20 @@ function getCurrentState() {
   return state[state.emotion];
 }
 
-function setCurrentState(updates) {
+function setCurrentState(updates, personalizing = true) {
   Object.assign(state[state.emotion], updates);
   saveToStorage();
-  syncToPhoton(state.emotion);
+  syncToPhoton(state.emotion, personalizing);
 }
 
-function syncToPhoton(emotion) {
+function syncToPhoton(emotion, personalizing = false) {
   const s = state[emotion];
   const payload = {
     emotion,
     colorScheme: s.colorScheme,
     selectedTrack: s.selectedTrack || '',
     motorSpeed: s.motorSpeed,
+    personalizing: !!personalizing,
   };
   fetch('/api/photon', {
     method: 'POST',
@@ -92,9 +93,9 @@ function init() {
   initMotorSlider();
   initSaveButton();
   applyStateToUI();
-  // Sync saved state to Photon on load (shows live preview; last sync wins for display)
-  syncToPhoton('negative');
-  syncToPhoton('positive');
+  // Sync saved state to Photon on load (no preview)
+  syncToPhoton('negative', false);
+  syncToPhoton('positive', false);
 }
 
 function applyStateToUI() {
@@ -128,7 +129,7 @@ function initEmotionToggle() {
       btn.setAttribute('aria-pressed', 'true');
       state.emotion = btn.dataset.emotion;
       applyStateToUI();
-      syncToPhoton(state.emotion);  // sync the newly selected emotion to device
+      syncToPhoton(state.emotion, false);  // emotion switch = not personalizing
     });
   });
 }

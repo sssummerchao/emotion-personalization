@@ -59,7 +59,7 @@ Add your MP3 files to the `music/` folder with these names:
 
 The player will work without these files; playback will fail gracefully until you add them.
 
-**DFPlayer SD card (on device):** The firmware uses `playMp3Folder(n)` which expects 4-digit filenames: `mp3/0001.mp3`, `mp3/0011.mp3`, etc. Rename your files so track 11 = `0011.mp3`, track 13 = `0013.mp3`, track 15 = `0015.mp3`. If preview still doesn't play, check Serial for "Web preview: playing track N" and ensure the SD card has the `mp3` folder with correctly named files.
+**DFPlayer SD card (on device):** Put files in `mp3/` in this order: 1st=0001 (Bird), 2nd=0003 (Crowd), 3rd=0005 (Forest), 4th=0007, 5th=0009, 6th=0011 (River), 7th=0013 (Rain), 8th=0015 (Drilling). `play()` uses file order, so the firmware maps track IDs to indices 1–8.
 
 ## Local Development
 
