@@ -209,65 +209,92 @@ body {
 }
 
 /* ============================================
-   Color Switcher
+   Hue Picker
    ============================================ */
 
-.color-schemes {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: var(--space-2);
+.hue-picker-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
-.color-btn {
-  aspect-ratio: 1;
-  border: none;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  padding: var(--space-1);
-  background: transparent;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.color-btn:hover {
-  transform: scale(1.05);
-}
-
-.color-btn.active {
-  box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--gradient-accent);
-}
-
-.color-preview {
-  display: block;
+.hue-slider {
+  -webkit-appearance: none;
+  appearance: none;
   width: 100%;
-  height: 100%;
-  border-radius: var(--radius-sm);
-  background-size: 200% 100%;
-  animation: gradient-shift 3.5s ease-in-out infinite;
+  height: 24px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(to right,
+    hsl(0, 100%, 50%),
+    hsl(30, 100%, 50%),
+    hsl(60, 100%, 50%),
+    hsl(90, 100%, 50%),
+    hsl(120, 100%, 50%),
+    hsl(150, 100%, 50%),
+    hsl(180, 100%, 50%),
+    hsl(210, 100%, 50%),
+    hsl(240, 100%, 50%),
+    hsl(270, 100%, 50%),
+    hsl(300, 100%, 50%),
+    hsl(330, 100%, 50%),
+    hsl(360, 100%, 50%)
+  );
+  outline: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
 }
 
-@keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+.hue-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #333;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: grab;
+  transition: transform 0.15s ease;
 }
 
-/* Light → saturated → light gradient (matches device transition) */
-.gradient-pink {
-  background: linear-gradient(90deg, #ff78c8 0%, #ff00c8 25%, #ff78c8 50%, #ff00c8 75%, #ff78c8 100%);
+.hue-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
 }
-.gradient-blue {
-  background: linear-gradient(90deg, #50b4ff 0%, #0064dc 25%, #50b4ff 50%, #0064dc 75%, #50b4ff 100%);
+
+.hue-slider::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.15);
 }
-.gradient-green {
-  background: linear-gradient(90deg, #50e68c 0%, #00b450 25%, #50e68c 50%, #00b450 75%, #50e68c 100%);
+
+.hue-slider::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #333;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: grab;
 }
-.gradient-orange {
-  background: linear-gradient(90deg, #ffc850 0%, #ff7800 25%, #ffc850 50%, #ff7800 75%, #ffc850 100%);
+
+.hue-preview {
+  display: flex;
+  gap: var(--space-2);
+  height: 48px;
 }
-.gradient-purple {
-  background: linear-gradient(90deg, #c878ff 0%, #7800c8 25%, #c878ff 50%, #7800c8 75%, #c878ff 100%);
+
+.hue-preview-light,
+.hue-preview-saturated {
+  flex: 1;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.2s ease;
 }
-.gradient-red {
-  background: linear-gradient(90deg, #ff6464 0%, #dc0000 25%, #ff6464 50%, #dc0000 75%, #ff6464 100%);
+
+.hue-hint {
+  font-size: var(--text-xs);
+  color: #6b7280;
+  text-align: center;
+  margin: 0;
 }
 
 /* ============================================

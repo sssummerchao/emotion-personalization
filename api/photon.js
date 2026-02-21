@@ -38,7 +38,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid JSON body' });
     }
   }
-  const { action, emotion, colorScheme, selectedTrack, motorSpeed, personalizing } = body || {};
+  const { action, emotion, hue, selectedTrack, motorSpeed, personalizing } = body || {};
 
   if (action === 'save') {
     const arg = JSON.stringify({ save: true });
@@ -66,15 +66,15 @@ export default async function handler(req, res) {
     }
   }
 
-  if (!emotion || !colorScheme) {
-    return res.status(400).json({ error: 'Missing emotion or colorScheme' });
+  if (!emotion || hue === undefined) {
+    return res.status(400).json({ error: 'Missing emotion or hue' });
   }
 
   // Track: send both ID (0001) and number (1) for DFPlayer play(n)
   const trackNum = selectedTrack ? parseInt(selectedTrack, 10) || 1 : 1;
   const arg = JSON.stringify({
     e: emotion,
-    c: colorScheme,
+    h: hue,
     t: selectedTrack || '',
     n: trackNum,
     m: motorSpeed ?? 50,

@@ -4,29 +4,31 @@
  * Selections are remembered per state and persisted in localStorage.
  */
 
-const SCHEMES = ['pink', 'blue', 'green', 'orange', 'purple', 'red'];
 const DEFAULT_STATE = {
-  colorScheme: 'orange',
+  hue: 30,
   selectedTrack: null,
   motorSpeed: 50,
 };
 
 const state = {
   emotion: 'positive',
-  positive: { ...DEFAULT_STATE },
-  negative: { ...DEFAULT_STATE },
+  positive: { ...DEFAULT_STATE, hue: 30 },
+  negative: { ...DEFAULT_STATE, hue: 210 },
 };
 
 // Track metadata for audio files
 const TRACKS = {
   '0001': 'Bird',
   '0003': 'Crowd noise',
-  '0005': 'Forest',
-  '0007': 'Static noise',
+  '0005': 'Bubble',
+  '0007': 'Fire',
   '0009': 'Hitting',
-  '00011': 'River',
-  '00013': 'Rain',
-  '00015': 'Drilling',
+  '0011': 'River',
+  '0013': 'Rain',
+  '0015': 'Drilling',
+  '0017': 'Cricket',
+  '0019': 'Ocean',
+  '0021': 'Underwater',
 };
 
 let audioElement = null;
@@ -69,7 +71,7 @@ function syncToPhoton(emotion, personalizing = false) {
   const s = state[emotion];
   const payload = {
     emotion,
-    colorScheme: s.colorScheme,
+    hue: s.hue,
     selectedTrack: s.selectedTrack || '',
     motorSpeed: s.motorSpeed,
     personalizing: !!personalizing,
@@ -98,13 +100,38 @@ function init() {
   syncToPhoton('positive', false);
 }
 
+function hslToRgb(h, s, l) {
+  s /= 100; l /= 100;
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = l - c / 2;
+  let r, g, b;
+  if (h < 60) { r = c; g = x; b = 0; }
+  else if (h < 120) { r = x; g = c; b = 0; }
+  else if (h < 180) { r = 0; g = c; b = x; }
+  else if (h < 240) { r = 0; g = x; b = c; }
+  else if (h < 300) { r = x; g = 0; b = c; }
+  else { r = c; g = 0; b = x; }
+  return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
+}
+
+function updateHuePreview(hue) {
+  const light = hslToRgb(hue, 80, 70);
+  const saturated = hslToRgb(hue, 100, 45);
+  const lightEl = document.querySelector('.hue-preview-light');
+  const satEl = document.querySelector('.hue-preview-saturated');
+  if (lightEl) lightEl.style.backgroundColor = `rgb(${light[0]}, ${light[1]}, ${light[2]})`;
+  if (satEl) satEl.style.backgroundColor = `rgb(${saturated[0]}, ${saturated[1]}, ${saturated[2]})`;
+}
+
 function applyStateToUI() {
   const s = getCurrentState();
-  // Color
-  document.body.setAttribute('data-scheme', s.colorScheme);
-  document.querySelectorAll('.color-btn').forEach((btn) => {
-    btn.classList.toggle('active', btn.dataset.scheme === s.colorScheme);
-  });
+  // Hue slider
+  const hueSlider = document.getElementById('hue-slider');
+  if (hueSlider) {
+    hueSlider.value = s.hue;
+    updateHuePreview(s.hue);
+  }
   // Music — show selected track for this state (don't auto-play)
   stopAudio();
   document.querySelectorAll('.track').forEach((el) => {
@@ -134,18 +161,17 @@ function initEmotionToggle() {
   });
 }
 
-// --- Color Switcher ---
+// --- Hue Picker ---
 function initColorSwitcher() {
-  const body = document.body;
-  document.querySelectorAll('.color-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const scheme = btn.dataset.scheme;
-      setCurrentState({ colorScheme: scheme });
-      body.setAttribute('data-scheme', scheme);
-      document.querySelectorAll('.color-btn').forEach((b) => {
-        b.classList.toggle('active', b.dataset.scheme === scheme);
-      });
-    });
+  const hueSlider = document.getElementById('hue-slider');
+  if (!hueSlider) return;
+  hueSlider.addEventListener('input', () => {
+    const hue = parseInt(hueSlider.value, 10);
+    updateHuePreview(hue);
+  });
+  hueSlider.addEventListener('change', () => {
+    const hue = parseInt(hueSlider.value, 10);
+    setCurrentState({ hue });
   });
 }
 

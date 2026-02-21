@@ -59,7 +59,7 @@ Add your MP3 files to the `music/` folder with these names:
 
 The player will work without these files; playback will fail gracefully until you add them.
 
-**DFPlayer SD card (on device):** Put files in `mp3/` in this order: 1st=0001 (Bird), 2nd=0003 (Crowd), 3rd=0005 (Forest), 4th=0007, 5th=0009, 6th=0011 (River), 7th=0013 (Rain), 8th=0015 (Drilling). `play()` uses file order, so the firmware maps track IDs to indices 1–8.
+**DFPlayer SD card (on device):** Put files in **mp3/** folder, copy **one at a time** in order: 0001 (Bird), 0003 (Crowd), 0005 (Bubble), 0007 (Fire), 0009 (Hitting), 0011 (River), 0013 (Rain), 0015 (Drilling), 0017 (Cricket), 0019 (Ocean), 0021 (Underwater). Total 11 tracks → `play(1)`–`play(11)`.
 
 ## Local Development
 

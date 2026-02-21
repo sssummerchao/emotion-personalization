@@ -33,28 +33,16 @@
         </div>
       </section>
 
-      <!-- Light Color Switcher -->
+      <!-- Light Color Picker -->
       <section class="card color-section">
         <h2 class="section-title">Light Color</h2>
-        <div class="color-schemes">
-          <button type="button" class="color-btn" data-scheme="pink" title="Pink / Magenta" aria-label="Pink Magenta gradient">
-            <span class="color-preview gradient-pink"></span>
-          </button>
-          <button type="button" class="color-btn" data-scheme="blue" title="Baby Blue / Ocean Blue" aria-label="Blue ocean gradient">
-            <span class="color-preview gradient-blue"></span>
-          </button>
-          <button type="button" class="color-btn" data-scheme="green" title="Light Green / Forest Green" aria-label="Green forest gradient">
-            <span class="color-preview gradient-green"></span>
-          </button>
-          <button type="button" class="color-btn active" data-scheme="orange" title="Yellow / Orange" aria-label="Yellow orange gradient">
-            <span class="color-preview gradient-orange"></span>
-          </button>
-          <button type="button" class="color-btn" data-scheme="purple" title="Light Purple / Dark Purple" aria-label="Purple gradient">
-            <span class="color-preview gradient-purple"></span>
-          </button>
-          <button type="button" class="color-btn" data-scheme="red" title="Light Red / Dark Red" aria-label="Red gradient">
-            <span class="color-preview gradient-red"></span>
-          </button>
+        <div class="hue-picker-container">
+          <input type="range" id="hue-slider" class="hue-slider" min="0" max="360" value="30" aria-label="Select hue color">
+          <div class="hue-preview">
+            <span class="hue-preview-light"></span>
+            <span class="hue-preview-saturated"></span>
+          </div>
+          <p class="hue-hint">Slide to pick your color hue</p>
         </div>
       </section>
 
@@ -82,21 +70,21 @@
             </div>
           </div>
           <div class="track" data-track="0005">
-            <button type="button" class="track-play" aria-label="Play Forest">
+            <button type="button" class="track-play" aria-label="Play Bubble">
               <span class="play-icon">▶</span>
             </button>
             <div class="track-info">
               <span class="track-id">0005</span>
-              <span class="track-label">Forest</span>
+              <span class="track-label">Bubble</span>
             </div>
           </div>
           <div class="track" data-track="0007">
-            <button type="button" class="track-play" aria-label="Play Static noise">
+            <button type="button" class="track-play" aria-label="Play Fire">
               <span class="play-icon">▶</span>
             </button>
             <div class="track-info">
               <span class="track-id">0007</span>
-              <span class="track-label">Static noise</span>
+              <span class="track-label">Fire</span>
             </div>
           </div>
           <div class="track" data-track="0009">
@@ -108,31 +96,58 @@
               <span class="track-label">Hitting</span>
             </div>
           </div>
-          <div class="track" data-track="00011">
+          <div class="track" data-track="0011">
             <button type="button" class="track-play" aria-label="Play River">
               <span class="play-icon">▶</span>
             </button>
             <div class="track-info">
-              <span class="track-id">00011</span>
+              <span class="track-id">0011</span>
               <span class="track-label">River</span>
             </div>
           </div>
-          <div class="track" data-track="00013">
+          <div class="track" data-track="0013">
             <button type="button" class="track-play" aria-label="Play Rain">
               <span class="play-icon">▶</span>
             </button>
             <div class="track-info">
-              <span class="track-id">00013</span>
+              <span class="track-id">0013</span>
               <span class="track-label">Rain</span>
             </div>
           </div>
-          <div class="track" data-track="00015">
+          <div class="track" data-track="0015">
             <button type="button" class="track-play" aria-label="Play Drilling">
               <span class="play-icon">▶</span>
             </button>
             <div class="track-info">
-              <span class="track-id">00015</span>
+              <span class="track-id">0015</span>
               <span class="track-label">Drilling</span>
+            </div>
+          </div>
+          <div class="track" data-track="0017">
+            <button type="button" class="track-play" aria-label="Play Cricket">
+              <span class="play-icon">▶</span>
+            </button>
+            <div class="track-info">
+              <span class="track-id">0017</span>
+              <span class="track-label">Cricket</span>
+            </div>
+          </div>
+          <div class="track" data-track="0019">
+            <button type="button" class="track-play" aria-label="Play Ocean">
+              <span class="play-icon">▶</span>
+            </button>
+            <div class="track-info">
+              <span class="track-id">0019</span>
+              <span class="track-label">Ocean</span>
+            </div>
+          </div>
+          <div class="track" data-track="0021">
+            <button type="button" class="track-play" aria-label="Play Underwater">
+              <span class="play-icon">▶</span>
+            </button>
+            <div class="track-info">
+              <span class="track-id">0021</span>
+              <span class="track-label">Underwater</span>
             </div>
           </div>
         </div>
