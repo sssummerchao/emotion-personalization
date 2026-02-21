@@ -36,13 +36,11 @@
       <!-- Light Color Picker -->
       <section class="card color-section">
         <h2 class="section-title">Light Color</h2>
+        <p class="hue-hint">Slide to pick your color hue</p>
         <div class="hue-picker-container">
           <input type="range" id="hue-slider" class="hue-slider" min="0" max="360" value="30" aria-label="Select hue color">
-          <div class="hue-preview">
-            <span class="hue-preview-light"></span>
-            <span class="hue-preview-saturated"></span>
-          </div>
-          <p class="hue-hint">Slide to pick your color hue</p>
+          <p class="preview-label">Device Preview</p>
+          <div class="hue-preview-gradient" id="hue-preview-gradient"></div>
         </div>
       </section>
 

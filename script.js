@@ -115,10 +115,13 @@ function hslToRgb(h, s, l) {
 function updateHuePreview(hue) {
   const light = hslToRgb(hue, 60, 50);
   const saturated = hslToRgb(hue, 80, 70);
-  const lightEl = document.querySelector('.hue-preview-light');
-  const satEl = document.querySelector('.hue-preview-saturated');
-  if (lightEl) lightEl.style.backgroundColor = `rgb(${light[0]}, ${light[1]}, ${light[2]})`;
-  if (satEl) satEl.style.backgroundColor = `rgb(${saturated[0]}, ${saturated[1]}, ${saturated[2]})`;
+  const gradientEl = document.getElementById('hue-preview-gradient');
+  if (gradientEl) {
+    const lightColor = `rgb(${light[0]}, ${light[1]}, ${light[2]})`;
+    const satColor = `rgb(${saturated[0]}, ${saturated[1]}, ${saturated[2]})`;
+    gradientEl.style.background = `linear-gradient(90deg, ${lightColor} 0%, ${satColor} 25%, ${lightColor} 50%, ${satColor} 75%, ${lightColor} 100%)`;
+    gradientEl.style.backgroundSize = '200% 100%';
+  }
 }
 
 function applyStateToUI() {
