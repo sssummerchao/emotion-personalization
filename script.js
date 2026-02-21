@@ -1,13 +1,12 @@
 /**
  * Photon Control - Web Dashboard
- * Each emotion state (Positive/Negative) has its own color, music, and motor speed.
+ * Each emotion state (Positive/Negative) has its own color and music.
  * Selections are remembered per state and persisted in localStorage.
  */
 
 const DEFAULT_STATE = {
   hue: 30,
   selectedTrack: null,
-  motorSpeed: 50,
 };
 
 const state = {
@@ -73,7 +72,6 @@ function syncToPhoton(emotion, personalizing = false) {
     emotion,
     hue: s.hue,
     selectedTrack: s.selectedTrack || '',
-    motorSpeed: s.motorSpeed,
     personalizing: !!personalizing,
   };
   fetch('/api/photon', {
@@ -92,7 +90,6 @@ function init() {
   initEmotionToggle();
   initColorSwitcher();
   initMusicPlayer();
-  initMotorSlider();
   initSaveButton();
   applyStateToUI();
   // Sync saved state to Photon on load (no preview)
@@ -138,9 +135,6 @@ function applyStateToUI() {
     el.classList.toggle('selected', el.dataset.track === s.selectedTrack);
     el.classList.remove('playing');
   });
-  // Motor
-  const slider = document.querySelector('.motor-slider');
-  if (slider) slider.value = s.motorSpeed;
 }
 
 // --- Emotion State ---
@@ -292,17 +286,6 @@ function initSaveButton() {
           btn.textContent = 'Save to Device';
         }, 3000);
       });
-  });
-}
-
-// --- Motor Slider ---
-function initMotorSlider() {
-  const slider = document.querySelector('.motor-slider');
-  if (!slider) return;
-
-  slider.addEventListener('input', (e) => {
-    const value = parseInt(e.target.value, 10);
-    setCurrentState({ motorSpeed: value });
   });
 }
 

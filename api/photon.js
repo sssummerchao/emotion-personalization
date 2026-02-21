@@ -38,7 +38,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid JSON body' });
     }
   }
-  const { action, emotion, hue, selectedTrack, motorSpeed, personalizing } = body || {};
+  const { action, emotion, hue, selectedTrack, personalizing } = body || {};
 
   if (action === 'save') {
     const arg = JSON.stringify({ save: true });
@@ -77,7 +77,7 @@ export default async function handler(req, res) {
     h: hue,
     t: selectedTrack || '',
     n: trackNum,
-    m: motorSpeed ?? 50,
+    m: 50,
     p: !!personalizing,
   });
 
