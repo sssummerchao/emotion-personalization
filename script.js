@@ -113,8 +113,8 @@ function hslToRgb(h, s, l) {
 }
 
 function updateHuePreview(hue) {
-  const light = hslToRgb(hue, 80, 70);
-  const saturated = hslToRgb(hue, 100, 45);
+  const light = hslToRgb(hue, 60, 50);
+  const saturated = hslToRgb(hue, 80, 70);
   const lightEl = document.querySelector('.hue-preview-light');
   const satEl = document.querySelector('.hue-preview-saturated');
   if (lightEl) lightEl.style.backgroundColor = `rgb(${light[0]}, ${light[1]}, ${light[2]})`;
