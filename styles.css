@@ -375,12 +375,6 @@ body {
   gap: 2px;
 }
 
-.track-id {
-  font-size: var(--text-xs);
-  font-weight: 600;
-  color: #9ca3af;
-}
-
 .track-label {
   font-size: var(--text-base);
   font-weight: 500;

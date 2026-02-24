@@ -18,11 +18,9 @@ const state = {
 // Track metadata for audio files
 const TRACKS = {
   '0001': 'Bird',
-  '0003': 'Crowd noise',
   '0005': 'Bubble',
   '0007': 'Fire',
   '0009': 'Hitting',
-  '0011': 'River',
   '0013': 'Rain',
   '0015': 'Drilling',
   '0017': 'Cricket',

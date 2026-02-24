@@ -49,17 +49,18 @@ If **Save to Device** shows "Failed", check the red error message below the butt
 Add your MP3 files to the `music/` folder with these names:
 
 - `0001.mp3` — Bird
-- `0003.mp3` — Crowd noise
-- `0005.mp3` — Forest
-- `0007.mp3` — Static noise
+- `0005.mp3` — Bubble
+- `0007.mp3` — Fire
 - `0009.mp3` — Hitting
-- `00011.mp3` — River
-- `00013.mp3` — Rain
-- `00015.mp3` — Drilling
+- `0013.mp3` — Rain
+- `0015.mp3` — Drilling
+- `0017.mp3` — Cricket
+- `0019.mp3` — Ocean
+- `0021.mp3` — Underwater
 
 The player will work without these files; playback will fail gracefully until you add them.
 
-**DFPlayer SD card (on device):** Put files in **mp3/** folder, copy **one at a time** in order: 0001 (Bird), 0003 (Crowd), 0005 (Bubble), 0007 (Fire), 0009 (Hitting), 0011 (River), 0013 (Rain), 0015 (Drilling), 0017 (Cricket), 0019 (Ocean), 0021 (Underwater). Total 11 tracks → `play(1)`–`play(11)`.
+**DFPlayer SD card (on device):** Copy files onto SD root (or into `mp3/`) in this exact order: 0001, 0003, 0005, 0007, 0009, 0011, 0013, 0015, 0017, 0019, 0021. First copied = Bird, second = Crowd, etc. Use `dot_clean` on Mac to remove hidden files. To calibrate the remap table: connect Serial (115200), type `play 1` through `play 11`, note what plays for each, then update `kTrackToPlayIndex` in `v1_sensor.cpp`.
 
 ## Local Development
 
