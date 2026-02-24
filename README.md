@@ -52,10 +52,10 @@ Add your MP3 files to the `music/` folder with these names:
 - `0005.mp3` — Bubble
 - `0007.mp3` — Fire
 - `0009.mp3` — Hitting
-- `0013.mp3` — Rain
+- `0013.mp3` — River
 - `0015.mp3` — Drilling
 - `0017.mp3` — Cricket
-- `0019.mp3` — Ocean
+- `0019.mp3` — Rain
 - `0021.mp3` — Underwater
 
 The player will work without these files; playback will fail gracefully until you add them.
