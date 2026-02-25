@@ -22,6 +22,17 @@ The web app syncs color, music, and motor settings to your Particle device. Set 
 
 Flash the updated firmware to your device so it has the `setState` cloud function.
 
+### Three-device family (Master / Light / Audio)
+
+The firmware can be built as three separate roles so one **Master** device (touch + PIR) drives one **Light** device (NeoPixel + lux) and one **Audio** device (DFPlayer + mic) over Particle events.
+
+- **Web** always talks only to the **Master** device. Set `PARTICLE_DEVICE_ID` to the Master device ID.
+- Build and flash each role with Particle CLI from the **project root** (the `v1` folder, so `lib/` and `project.properties` are included). Uncomment the matching role in `src/v1_sensor.cpp` (lines 16–18) before each compile:
+  - Master: `particle compile photon2 --saveTo firmware-master.bin` then `particle flash <MASTER_ID> firmware-master.bin`
+  - Light: `particle compile photon2 --saveTo firmware-light.bin` then `particle flash <LIGHT_ID> firmware-light.bin`
+  - Audio: `particle compile photon2 --saveTo firmware-audio.bin` then `particle flash <AUDIO_ID> firmware-audio.bin`
+- Master publishes `photon/state` (private) about once per second; Light and Audio subscribe with `MY_DEVICES` and drive their outputs from that state plus local lux/mic.
+
 ## Troubleshooting
 
 If **Save to Device** shows "Failed", check the red error message below the button:

@@ -28,8 +28,6 @@ const TRACKS = {
   '0021': 'Underwater',
 };
 
-let audioElement = null;
-
 function loadFromStorage() {
   try {
     const saved = localStorage.getItem('photon-state');
@@ -130,11 +128,9 @@ function applyStateToUI() {
     hueSlider.value = s.hue;
     updateHuePreview(s.hue);
   }
-  // Music — show selected track for this state (don't auto-play)
-  stopAudio();
+  // Music — show selected track for this state
   document.querySelectorAll('.track').forEach((el) => {
     el.classList.toggle('selected', el.dataset.track === s.selectedTrack);
-    el.classList.remove('playing');
   });
 }
 
@@ -173,20 +169,8 @@ function initColorSwitcher() {
 // --- Music Player ---
 function initMusicPlayer() {
   document.querySelectorAll('.track').forEach((trackEl) => {
-    const playBtn = trackEl.querySelector('.track-play');
     const trackId = trackEl.dataset.track;
-
-    // Select: click track row to choose for this emotion (no play)
-    trackEl.addEventListener('click', (e) => {
-      if (e.target.closest('.track-play')) return; // play btn has its own handler
-      selectTrack(trackId, trackEl);
-    });
-
-    // Play: click play button for preview only (doesn't change selection)
-    playBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      togglePlay(trackId, trackEl);
-    });
+    trackEl.addEventListener('click', () => selectTrack(trackId, trackEl));
   });
 }
 
@@ -198,42 +182,6 @@ function selectTrack(trackId, trackEl) {
   document.querySelectorAll('.track').forEach((t) => {
     t.classList.toggle('selected', t.dataset.track === newSelection);
   });
-}
-
-function togglePlay(trackId, trackEl) {
-  const isThisPlaying = trackEl.classList.contains('playing');
-  if (isThisPlaying) {
-    stopAudio();
-    trackEl.classList.remove('playing');
-    return;
-  }
-  stopAudio();
-  document.querySelectorAll('.track').forEach((t) => t.classList.remove('playing'));
-  trackEl.classList.add('playing');
-  playAudio(trackId);
-}
-
-function playAudio(trackId) {
-  if (!audioElement) {
-    audioElement = new Audio();
-    audioElement.addEventListener('ended', () => {
-      document.querySelectorAll('.track').forEach((t) => t.classList.remove('playing'));
-      // Keep selected — user's choice for this state stays
-    });
-  }
-  audioElement.src = `music/${trackId}.mp3`;
-  audioElement.play().catch((err) => {
-    console.warn('Audio playback failed (file may not exist):', trackId, err);
-    document.querySelectorAll('.track').forEach((t) => t.classList.remove('playing'));
-  });
-}
-
-function stopAudio() {
-  if (audioElement) {
-    audioElement.pause();
-    audioElement.currentTime = 0;
-    audioElement.src = '';
-  }
 }
 
 // --- Save to Device ---
