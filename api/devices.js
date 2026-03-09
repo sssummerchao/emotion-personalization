@@ -49,16 +49,25 @@ export default async function handler(req, res) {
   let lightOnline = true;
   let soundOnline = true;
 
-  // Ping all devices in parallel for accurate real-time status
+  // Ping devices in parallel. When sound/light share master's device ID, use master's result.
+  const soundPingId = soundId && soundId !== masterId ? soundId : null;
   const [masterResult, lightResult, soundResult] = await Promise.all([
     pingDevice(token, masterId),
-    lightId ? pingDevice(token, lightId) : { online: null },
-    soundId ? pingDevice(token, soundId) : { online: null },
+    lightId && lightId !== masterId ? pingDevice(token, lightId) : { online: null },
+    soundPingId ? pingDevice(token, soundPingId) : { online: null },
   ]);
 
   if (masterResult.online !== null) masterOnline = masterResult.online;
-  if (lightResult.online !== null) lightOnline = lightResult.online;
-  if (soundResult.online !== null) soundOnline = soundResult.online;
+  if (lightId === masterId) {
+    lightOnline = masterOnline;
+  } else if (lightResult.online !== null) {
+    lightOnline = lightResult.online;
+  }
+  if (soundId === masterId || !soundId) {
+    soundOnline = masterOnline;  // Sound often runs on master; if same ID or unset, use master status
+  } else if (soundResult.online !== null) {
+    soundOnline = soundResult.online;
+  }
 
   const out = { master: masterOnline, light: lightOnline, sound: soundOnline };
   if (debug) {
