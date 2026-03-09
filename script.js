@@ -2,6 +2,7 @@
  * Photon Control - Web Dashboard
  * Each emotion state (Positive/Negative) has its own color and music.
  * Selections are remembered per state and persisted in localStorage.
+ * Device status (master, light, sound) controls which screen and banners to show.
  */
 
 const DEFAULT_STATE = {
@@ -13,6 +14,7 @@ const state = {
   emotion: 'positive',
   positive: { ...DEFAULT_STATE, hue: 30 },
   negative: { ...DEFAULT_STATE, hue: 210 },
+  devices: { master: true, light: true, sound: true },
 };
 
 // Track metadata for audio files
@@ -27,6 +29,8 @@ const TRACKS = {
   '0019': 'Rain',
   '0021': 'Underwater',
 };
+
+const POLL_INTERVAL_MS = 10000;
 
 function loadFromStorage() {
   try {
@@ -59,10 +63,103 @@ function getCurrentState() {
 function setCurrentState(updates, personalizing = true) {
   Object.assign(state[state.emotion], updates);
   saveToStorage();
-  syncToPhoton(state.emotion, personalizing);
+  if (state.devices.master) {
+    syncToPhoton(state.emotion, personalizing);
+  }
+}
+
+function parseBool(val) {
+  return val !== '0' && val !== 'false';
+}
+
+async function fetchDeviceStatus() {
+  const params = new URLSearchParams(window.location.search);
+  const hasParams = params.get('master') !== null || params.get('light') !== null || params.get('sound') !== null;
+
+  try {
+    const q = {};
+    if (params.get('master') !== null) q.master = params.get('master');
+    if (params.get('light') !== null) q.light = params.get('light');
+    if (params.get('sound') !== null) q.sound = params.get('sound');
+    const query = Object.keys(q).length ? '?' + new URLSearchParams(q).toString() : '';
+    const r = await fetch('/api/devices' + query);
+    if (!r.ok) throw new Error('API not ok');
+    const data = await r.json();
+    state.devices = {
+      master: data.master !== false,
+      light: data.light !== false,
+      sound: data.sound !== false,
+    };
+  } catch (e) {
+    if (hasParams) {
+      state.devices = {
+        master: params.get('master') === null ? true : parseBool(params.get('master')),
+        light: params.get('light') === null ? true : parseBool(params.get('light')),
+        sound: params.get('sound') === null ? true : parseBool(params.get('sound')),
+      };
+    }
+  }
+  return state.devices;
+}
+
+function applyDeviceStatus() {
+  const { master, light, sound } = state.devices;
+
+  const screenMasterOffline = document.getElementById('screen-master-offline');
+  const screenPersonalize = document.getElementById('screen-personalize');
+
+  if (!master) {
+    if (screenMasterOffline) screenMasterOffline.hidden = false;
+    if (screenPersonalize) screenPersonalize.hidden = true;
+    return;
+  }
+
+  if (screenMasterOffline) screenMasterOffline.hidden = true;
+  if (screenPersonalize) screenPersonalize.hidden = false;
+
+  // Light section - when offline: hide entire online block (label + controls), show only offline banner
+  const lightSection = document.getElementById('light-section');
+  const lightOnlineContent = document.getElementById('light-online-content');
+  const lightBanner = document.getElementById('light-offline-banner');
+  if (lightOnlineContent && lightBanner) {
+    lightOnlineContent.style.display = light ? '' : 'none';
+    lightBanner.hidden = light;
+    if (lightSection) {
+      lightSection.classList.toggle('light-offline', !light);
+      if (!light) {
+        lightSection.style.background = '';
+      } else {
+        updateHuePreview(getCurrentState().hue);
+      }
+    }
+  }
+
+  // Sound section - when offline: hide entire online block (label + controls), show only offline banner
+  const soundSection = document.getElementById('sound-section');
+  const soundOnlineContent = document.getElementById('sound-online-content');
+  const soundBanner = document.getElementById('sound-offline-banner');
+  if (soundOnlineContent && soundBanner) {
+    if (sound) {
+      soundOnlineContent.style.removeProperty('display');
+    } else {
+      soundOnlineContent.style.setProperty('display', 'none', 'important');
+    }
+    soundBanner.hidden = sound;
+    if (soundSection) soundSection.classList.toggle('sound-offline', !sound);
+  }
+
+  // Save button
+  const saveBtn = document.getElementById('save-to-device');
+  if (saveBtn) {
+    const anyDevice = light || sound;
+    saveBtn.disabled = !anyDevice;
+    saveBtn.classList.toggle('save-disabled', !anyDevice);
+    saveBtn.textContent = !anyDevice ? 'No devices available' : 'Save emotion';
+  }
 }
 
 function syncToPhoton(emotion, personalizing = false) {
+  if (!state.devices.master) return;
   const s = state[emotion];
   const payload = {
     emotion,
@@ -88,9 +185,29 @@ function init() {
   initMusicPlayer();
   initSaveButton();
   applyStateToUI();
-  // Sync saved state to Photon on load (no preview)
-  syncToPhoton('negative', false);
-  syncToPhoton('positive', false);
+  initDeviceStatus();
+}
+
+async function initDeviceStatus() {
+  const params = new URLSearchParams(window.location.search);
+  const hasParams = params.get('master') !== null || params.get('light') !== null || params.get('sound') !== null;
+  if (hasParams) {
+    state.devices = {
+      master: params.get('master') === null ? true : parseBool(params.get('master')),
+      light: params.get('light') === null ? true : parseBool(params.get('light')),
+      sound: params.get('sound') === null ? true : parseBool(params.get('sound')),
+    };
+  }
+  await fetchDeviceStatus();
+  applyDeviceStatus();
+  if (state.devices.master) {
+    syncToPhoton('negative', false);
+    syncToPhoton('positive', false);
+  }
+  setInterval(async () => {
+    await fetchDeviceStatus();
+    applyDeviceStatus();
+  }, POLL_INTERVAL_MS);
 }
 
 function hslToRgb(h, s, l) {
@@ -118,27 +235,41 @@ function updateHuePreview(hue) {
     gradientEl.style.background = `linear-gradient(90deg, ${lightColor} 0%, ${satColor} 25%, ${lightColor} 50%, ${satColor} 75%, ${lightColor} 100%)`;
     gradientEl.style.backgroundSize = '200% 100%';
   }
+  const lightSection = document.getElementById('light-section');
+  if (lightSection && !lightSection.classList.contains('light-offline')) {
+    const tint1 = `hsla(${hue}, 45%, 95%, 0.9)`;
+    const tint2 = `hsla(${hue}, 35%, 92%, 0.8)`;
+    lightSection.style.background = `linear-gradient(180deg, ${tint1} 0%, ${tint2} 100%)`;
+  }
 }
 
 function applyStateToUI() {
   const s = getCurrentState();
-  // Hue slider
   const hueSlider = document.getElementById('hue-slider');
   if (hueSlider) {
     hueSlider.value = s.hue;
     updateHuePreview(s.hue);
   }
-  // Music — show selected track for this state
-  document.querySelectorAll('.track').forEach((el) => {
+  document.querySelectorAll('.track-chip').forEach((el) => {
     el.classList.toggle('selected', el.dataset.track === s.selectedTrack);
   });
+  updateEmotionIcons();
 }
 
-// --- Emotion State ---
+function updateEmotionIcons() {
+  const posIcon = document.querySelector('.emotion-btn[data-emotion="positive"] .emotion-icon');
+  const negIcon = document.querySelector('.emotion-btn[data-emotion="negative"] .emotion-icon');
+  const positiveActive = state.emotion === 'positive';
+  if (posIcon) posIcon.src = positiveActive ? 'assets/positive-white.png' : 'assets/positive-blue.png';
+  if (negIcon) negIcon.src = positiveActive ? 'assets/negative-blue.png' : 'assets/negative-white.png';
+}
+
 function initEmotionToggle() {
+  updateEmotionIcons();
   const buttons = document.querySelectorAll('.emotion-btn');
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
+      if (!state.devices.master) return;
       buttons.forEach((b) => {
         b.classList.remove('active');
         b.setAttribute('aria-pressed', 'false');
@@ -146,13 +277,13 @@ function initEmotionToggle() {
       btn.classList.add('active');
       btn.setAttribute('aria-pressed', 'true');
       state.emotion = btn.dataset.emotion;
+      updateEmotionIcons();
       applyStateToUI();
-      syncToPhoton(state.emotion, false);  // emotion switch = not personalizing
+      syncToPhoton(state.emotion, false);
     });
   });
 }
 
-// --- Hue Picker ---
 function initColorSwitcher() {
   const hueSlider = document.getElementById('hue-slider');
   if (!hueSlider) return;
@@ -166,25 +297,24 @@ function initColorSwitcher() {
   });
 }
 
-// --- Music Player ---
 function initMusicPlayer() {
-  document.querySelectorAll('.track').forEach((trackEl) => {
+  document.querySelectorAll('.track-chip').forEach((trackEl) => {
     const trackId = trackEl.dataset.track;
     trackEl.addEventListener('click', () => selectTrack(trackId, trackEl));
   });
 }
 
 function selectTrack(trackId, trackEl) {
+  if (!state.devices.master) return;
   const s = getCurrentState();
   const isDeselecting = s.selectedTrack === trackId;
   const newSelection = isDeselecting ? null : trackId;
   setCurrentState({ selectedTrack: newSelection });
-  document.querySelectorAll('.track').forEach((t) => {
+  document.querySelectorAll('.track-chip').forEach((t) => {
     t.classList.toggle('selected', t.dataset.track === newSelection);
   });
 }
 
-// --- Save to Device ---
 function initSaveButton() {
   const btn = document.getElementById('save-to-device');
   const errEl = document.getElementById('save-error');
@@ -204,6 +334,7 @@ function initSaveButton() {
   }
 
   btn.addEventListener('click', () => {
+    if (btn.disabled) return;
     btn.disabled = true;
     clearError();
     btn.textContent = 'Saving…';
@@ -215,24 +346,26 @@ function initSaveButton() {
       .then((r) => r.json().catch(() => ({})))
       .then((data) => {
         if (data.ok) {
-          btn.textContent = 'Saved!';
+          btn.textContent = 'Emotion saved!';
           clearError();
         } else {
-          btn.textContent = 'Failed';
+          btn.textContent = state.devices.light || state.devices.sound ? 'Save emotion' : 'No devices available';
           const msg = data.error || data.details?.error_description || JSON.stringify(data);
           showError(msg);
         }
         setTimeout(() => {
-          btn.disabled = false;
-          btn.textContent = 'Save to Device';
+          btn.disabled = !(state.devices.light || state.devices.sound);
+          btn.classList.toggle('save-disabled', btn.disabled);
+          btn.textContent = btn.disabled ? 'No devices available' : 'Save emotion';
         }, 3000);
       })
       .catch((err) => {
-        btn.textContent = 'Failed';
+        btn.textContent = state.devices.light || state.devices.sound ? 'Save emotion' : 'No devices available';
         showError(err?.message || 'Network error — check console');
         setTimeout(() => {
-          btn.disabled = false;
-          btn.textContent = 'Save to Device';
+          btn.disabled = !(state.devices.light || state.devices.sound);
+          btn.classList.toggle('save-disabled', btn.disabled);
+          btn.textContent = btn.disabled ? 'No devices available' : 'Save emotion';
         }, 3000);
       });
   });

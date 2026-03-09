@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Questions about the device — Photon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <div class="root questions-page">
+      <a href="index.html" class="back-link">← Back to personalization</a>
+
+      <!-- What are the devices -->
+      <section class="questions-section">
+        <h1 class="questions-title">What are the devices</h1>
+        <p class="questions-body">We use a set of devices to communicate emotions between you and your remote partner by changing elements of your environment like light color and sound.</p>
+        <p class="questions-body">Each person receives a set of three devices:</p>
+
+        <div class="device-list">
+          <div class="device-item">
+            <div class="device-icon-wrap">
+              <div class="device-ellipse"></div>
+              <img class="device-icon master-icon" src="assets/master-device.png" alt="" width="86" height="54">
+              <span class="device-name">Master</span>
+            </div>
+            <p class="device-desc">Send emotions through touch or press</p>
+          </div>
+
+          <div class="device-item">
+            <div class="device-icon-wrap">
+              <div class="device-ellipse"></div>
+              <img class="device-icon light-icon" src="assets/light-device.png" alt="" width="90" height="60">
+              <span class="device-name">Light</span>
+            </div>
+            <p class="device-desc">Displays emotions through changes in light color</p>
+          </div>
+
+          <div class="device-item">
+            <div class="device-icon-wrap">
+              <div class="device-ellipse"></div>
+              <img class="device-icon sound-icon" src="assets/sound-device.png" alt="" width="104" height="53">
+              <span class="device-name">Sound</span>
+            </div>
+            <p class="device-desc">Plays sounds that represent emotions</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- How do the devices work -->
+      <section class="questions-section">
+        <h1 class="questions-title">How do the devices work</h1>
+        <p class="questions-body">Communication between you and your partner happens only through the master devices because it is connected to the light and sound devices and controls how they respond.</p>
+
+        <div class="diagram">
+          <img src="assets/emotion-communication.png" alt="Emotion communication between devices" class="diagram-img">
+        </div>
+
+        <p class="questions-body">Personalization is also handled through the master device. It receives signals from the website to store your preferred light colors and sounds for each emotion.</p>
+        <p class="questions-body">In order to send an emotion, follow the following steps:</p>
+
+        <div class="step-list">
+          <div class="step-item">
+            <span class="step-num">1</span>
+            <p>Both parties need to be present in the same space. (A white light indicator of the master device will lit up)</p>
+          </div>
+          <div class="step-item">
+            <span class="step-num">2</span>
+            <p>Press on the master device to see selection of emotion. Release on the emotion you want to send.</p>
+          </div>
+          <div class="step-item">
+            <span class="step-num">3</span>
+            <p>Emotion will be displayed on both you and your partner's devices.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Do you have any questions? -->
+      <section class="questions-section">
+        <h1 class="questions-title">Do you have any questions?</h1>
+        <p class="questions-body">If you experience any issues with your devices or have questions about how they work, please contact Summer at <a href="mailto:summerc@andrew.cmu.edu">summerc@andrew.cmu.edu</a>.</p>
+      </section>
+    </div>
+  </div>
+</body>
+</html>
