@@ -448,6 +448,11 @@ body {
   text-decoration: underline;
 }
 
+.admin-checkbox-standalone {
+  margin-top: 24px;
+  padding: 0 14px;
+}
+
 /* ============================================
    Master Offline - Blocked Screen (Figma 595:1750)
    ============================================ */
@@ -536,7 +541,8 @@ body {
 
 .offline-banner-text {
   flex: 1;
-  max-width: 174px;
+  max-width: 240px;
+  min-width: 0;
 }
 
 .offline-banner p {
