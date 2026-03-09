@@ -82,7 +82,7 @@ export default async function handler(req, res) {
     lightOnline = true;
   } else if (lightResult.online === false) {
     const lightGet = await getDeviceOnline(token, lightId);
-    lightOnline = lightGet === true ? true : false;
+    lightOnline = lightGet === false ? false : true;  // assume online if GET can't confirm offline
   }
   if (soundId === masterId || !soundId) {
     soundOnline = masterOnline;
@@ -90,7 +90,7 @@ export default async function handler(req, res) {
     soundOnline = true;
   } else if (soundResult.online === false) {
     const soundGet = await getDeviceOnline(token, soundId);
-    soundOnline = soundGet === true ? true : false;
+    soundOnline = soundGet === false ? false : true;  // assume online if GET can't confirm offline
   }
 
   const out = { master: masterOnline, light: lightOnline, sound: soundOnline };
