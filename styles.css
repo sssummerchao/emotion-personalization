@@ -456,6 +456,10 @@ body {
   display: none !important;
 }
 
+#screen-master-offline {
+  max-width: 400px;
+}
+
 .blocked-content {
   display: flex;
   flex-direction: column;
