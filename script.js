@@ -112,13 +112,25 @@ function applyDeviceStatus() {
   const screenPersonalize = document.getElementById('screen-personalize');
 
   if (!master) {
-    if (screenMasterOffline) screenMasterOffline.hidden = false;
-    if (screenPersonalize) screenPersonalize.hidden = true;
+    if (screenMasterOffline) {
+      screenMasterOffline.hidden = false;
+      screenMasterOffline.style.display = '';
+    }
+    if (screenPersonalize) {
+      screenPersonalize.hidden = true;
+      screenPersonalize.style.display = 'none';
+    }
     return;
   }
 
-  if (screenMasterOffline) screenMasterOffline.hidden = true;
-  if (screenPersonalize) screenPersonalize.hidden = false;
+  if (screenMasterOffline) {
+    screenMasterOffline.hidden = true;
+    screenMasterOffline.style.display = 'none';
+  }
+  if (screenPersonalize) {
+    screenPersonalize.hidden = false;
+    screenPersonalize.style.display = '';
+  }
 
   // Light section - when offline: hide entire online block (label + controls), show only offline banner
   const lightSection = document.getElementById('light-section');
