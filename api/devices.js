@@ -1,44 +1,22 @@
-/** Max seconds since last contact to consider device online. Particle keep-alive ~25–30s. */
-const STALE_THRESHOLD_SEC = 90;
-
-function parseTimestamp(ts) {
-  if (!ts || typeof ts !== 'string') return null;
-  const ms = new Date(ts).getTime();
-  return isNaN(ms) ? null : ms;
-}
-
-async function fetchDeviceStatus(token, deviceId, forDebug) {
+/**
+ * Uses Particle Ping API - actively checks if device responds. Most reliable method.
+ * GET /v1/devices/:id can report stale "online: true"; Ping actually reaches the device.
+ */
+async function pingDevice(token, deviceId) {
   if (!token || !deviceId) return { online: null };
   try {
     const resp = await fetch(
-      `https://api.particle.io/v1/devices/${deviceId}?access_token=${token}`
+      `https://api.particle.io/v1/devices/${deviceId}/ping`,
+      { method: 'PUT', headers: { Authorization: `Bearer ${token}` } }
     );
     const data = await resp.json().catch(() => ({}));
-    if (!data.id) return { online: null };
-
-    const online = data.online ?? data.connected;
-    if (typeof online !== 'boolean') return { online: null };
-
-    // Trust online: false. When online: true, check freshness—Particle can be slow to update.
-    let result = online;
-    const lastHeardMs = parseTimestamp(data.last_heard) ?? parseTimestamp(data.last_handshake_at);
-    if (online && lastHeardMs) {
-      const ageSec = (Date.now() - lastHeardMs) / 1000;
-      if (ageSec > STALE_THRESHOLD_SEC) result = false; // stale → offline
-    }
-
-    const out = { online: result };
-    if (forDebug) {
-      out._raw = {
-        online,
-        last_heard: data.last_heard ?? null,
-        last_handshake_at: data.last_handshake_at ?? null,
-        age_sec: lastHeardMs ? Math.round((Date.now() - lastHeardMs) / 1000) : null,
-      };
-    }
-    return out;
-  } catch {}
-  return { online: null };
+    if (typeof data.online === 'boolean') return { online: data.online };
+    // Particle may return { ok: false } or error when offline
+    if (resp.status === 404 || data.error) return { online: false };
+    return { online: null };
+  } catch {
+    return { online: null };
+  }
 }
 
 export default async function handler(req, res) {
@@ -71,20 +49,16 @@ export default async function handler(req, res) {
   let lightOnline = true;
   let soundOnline = true;
 
-  const masterResult = await fetchDeviceStatus(token, masterId, debug);
+  // Ping all devices in parallel for accurate real-time status
+  const [masterResult, lightResult, soundResult] = await Promise.all([
+    pingDevice(token, masterId),
+    lightId ? pingDevice(token, lightId) : { online: null },
+    soundId ? pingDevice(token, soundId) : { online: null },
+  ]);
+
   if (masterResult.online !== null) masterOnline = masterResult.online;
-
-  let lightResult = { online: null };
-  if (lightId) {
-    lightResult = await fetchDeviceStatus(token, lightId, debug);
-    if (lightResult.online !== null) lightOnline = lightResult.online;
-  }
-
-  let soundResult = { online: null };
-  if (soundId) {
-    soundResult = await fetchDeviceStatus(token, soundId, debug);
-    if (soundResult.online !== null) soundOnline = soundResult.online;
-  }
+  if (lightResult.online !== null) lightOnline = lightResult.online;
+  if (soundResult.online !== null) soundOnline = soundResult.online;
 
   const out = { master: masterOnline, light: lightOnline, sound: soundOnline };
   if (debug) {
@@ -93,9 +67,9 @@ export default async function handler(req, res) {
       hasLightId: !!lightId,
       hasSoundId: !!soundId,
       hasToken: !!token,
-      master: masterResult._raw,
-      light: lightResult._raw,
-      sound: soundResult._raw,
+      master: masterResult.online,
+      light: lightResult.online,
+      sound: soundResult.online,
     };
   }
   return res.status(200).json(out);
