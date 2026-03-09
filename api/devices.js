@@ -1,21 +1,44 @@
-/**
- * Vercel serverless function: returns device connection status
- * GET /api/devices returns { master, light, sound } for UI to show appropriate screens
- * Uses Particle API to check each device's connected status.
- * Env vars: PARTICLE_ACCESS_TOKEN, PARTICLE_DEVICE_ID (master),
- *   PARTICLE_LIGHT_DEVICE_ID, PARTICLE_SOUND_DEVICE_ID (optional)
- * Query params for testing: ?master=0 | ?light=0 | ?sound=0
- */
-async function fetchDeviceConnected(token, deviceId) {
-  if (!token || !deviceId) return null;
+/** Max seconds since last contact to consider device online. Particle keep-alive ~25–30s. */
+const STALE_THRESHOLD_SEC = 90;
+
+function parseTimestamp(ts) {
+  if (!ts || typeof ts !== 'string') return null;
+  const ms = new Date(ts).getTime();
+  return isNaN(ms) ? null : ms;
+}
+
+async function fetchDeviceStatus(token, deviceId, forDebug) {
+  if (!token || !deviceId) return { online: null };
   try {
     const resp = await fetch(
       `https://api.particle.io/v1/devices/${deviceId}?access_token=${token}`
     );
     const data = await resp.json().catch(() => ({}));
-    if (data.id && typeof data.connected === 'boolean') return data.connected;
+    if (!data.id) return { online: null };
+
+    const online = data.online ?? data.connected;
+    if (typeof online !== 'boolean') return { online: null };
+
+    // Trust online: false. When online: true, check freshness—Particle can be slow to update.
+    let result = online;
+    const lastHeardMs = parseTimestamp(data.last_heard) ?? parseTimestamp(data.last_handshake_at);
+    if (online && lastHeardMs) {
+      const ageSec = (Date.now() - lastHeardMs) / 1000;
+      if (ageSec > STALE_THRESHOLD_SEC) result = false; // stale → offline
+    }
+
+    const out = { online: result };
+    if (forDebug) {
+      out._raw = {
+        online,
+        last_heard: data.last_heard ?? null,
+        last_handshake_at: data.last_handshake_at ?? null,
+        age_sec: lastHeardMs ? Math.round((Date.now() - lastHeardMs) / 1000) : null,
+      };
+    }
+    return out;
   } catch {}
-  return null; // unknown
+  return { online: null };
 }
 
 export default async function handler(req, res) {
@@ -48,17 +71,19 @@ export default async function handler(req, res) {
   let lightOnline = true;
   let soundOnline = true;
 
-  const masterResult = await fetchDeviceConnected(token, masterId);
-  if (masterResult !== null) masterOnline = masterResult;
+  const masterResult = await fetchDeviceStatus(token, masterId, debug);
+  if (masterResult.online !== null) masterOnline = masterResult.online;
 
+  let lightResult = { online: null };
   if (lightId) {
-    const lightResult = await fetchDeviceConnected(token, lightId);
-    if (lightResult !== null) lightOnline = lightResult;
+    lightResult = await fetchDeviceStatus(token, lightId, debug);
+    if (lightResult.online !== null) lightOnline = lightResult.online;
   }
 
+  let soundResult = { online: null };
   if (soundId) {
-    const soundResult = await fetchDeviceConnected(token, soundId);
-    if (soundResult !== null) soundOnline = soundResult;
+    soundResult = await fetchDeviceStatus(token, soundId, debug);
+    if (soundResult.online !== null) soundOnline = soundResult.online;
   }
 
   const out = { master: masterOnline, light: lightOnline, sound: soundOnline };
@@ -68,6 +93,9 @@ export default async function handler(req, res) {
       hasLightId: !!lightId,
       hasSoundId: !!soundId,
       hasToken: !!token,
+      master: masterResult._raw,
+      light: lightResult._raw,
+      sound: soundResult._raw,
     };
   }
   return res.status(200).json(out);
