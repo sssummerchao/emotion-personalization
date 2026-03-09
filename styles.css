@@ -83,7 +83,7 @@ body {
   min-height: 100vh;
   background: var(--color-bg);
   position: relative;
-  padding: 24px 14px 40px;
+  padding: 24px 12px 40px;
 }
 
 /* ============================================
@@ -197,7 +197,7 @@ body {
 }
 
 .personalize-subsection {
-  padding: 24px 14px;
+  padding: 24px 0;
 }
 
 /* Light subsection: gradient when online (628:2216) */
@@ -450,7 +450,7 @@ body {
 
 .admin-checkbox-standalone {
   margin-top: 24px;
-  padding: 0 14px;
+  padding: 0 12px;
 }
 
 /* ============================================
@@ -534,15 +534,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 14px;
+  padding: 24px 0;
   gap: 16px;
   min-height: 143px;
 }
 
 .offline-banner-text {
-  flex: 1 1 0;
-  min-width: 230px;
-  max-width: 320px;
+  flex: 1;
+  min-width: 0;
 }
 
 .offline-banner p {
@@ -559,8 +558,7 @@ body {
 }
 
 .offline-icon {
-  flex-shrink: 1;
-  min-width: 50px;
+  flex-shrink: 0;
 }
 
 .offline-icon.light-icon {
