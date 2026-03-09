@@ -34,6 +34,7 @@ export default async function handler(req, res) {
   }
 
   // No sim: try Particle API for master status
+  // Default true = allow personalization when we can't determine status (API error, no env, etc.)
   let masterOnline = true;
   if (token && deviceId) {
     try {
@@ -41,9 +42,12 @@ export default async function handler(req, res) {
         `https://api.particle.io/v1/devices/${deviceId}?access_token=${token}`
       );
       const data = await resp.json().catch(() => ({}));
-      masterOnline = !!(data.id && data.connected);
+      // Only show offline when we have a valid device response and it reports disconnected
+      if (data.id && typeof data.connected === 'boolean') {
+        masterOnline = data.connected;
+      }
     } catch {
-      masterOnline = false;
+      // On fetch error, keep masterOnline = true so personalization still works
     }
   }
 

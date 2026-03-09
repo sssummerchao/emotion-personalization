@@ -193,6 +193,37 @@ body {
   margin-bottom: 0;
 }
 
+/* Admin: Ignore sensor */
+.admin-section {
+  padding: 16px 15px 24px;
+  border-top: 1px solid var(--color-primary-border);
+}
+
+.admin-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-primary);
+  letter-spacing: -0.28px;
+  cursor: pointer;
+}
+
+.admin-checkbox input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+}
+
+.admin-hint {
+  font-size: 12px;
+  color: var(--color-primary);
+  opacity: 0.8;
+  margin-top: 6px;
+  margin-left: 28px;
+}
+
 .personalize-card .save-btn {
   width: 100%;
   height: 48px;
