@@ -10,9 +10,12 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div id="loading-screen" class="loading-screen" aria-live="polite" aria-busy="true">
+    <div class="loading-spinner"></div>
+  </div>
   <div class="app">
-    <!-- Master Offline: Blocked Entry (Figma 595:1750) -->
-    <div id="screen-master-offline" class="root screen" hidden>
+    <!-- Master Offline: Blocked Entry (Figma 595:1750) - shown by default until API confirms master is online -->
+    <div id="screen-master-offline" class="root screen">
       <div class="blocked-content">
         <h1 class="blocked-title">Looks like your master device is offline.</h1>
         <div class="blocked-illustration" aria-hidden="true">
@@ -23,8 +26,8 @@
       </div>
     </div>
 
-    <!-- Personalization Screen (592:1570, 628:2143, 631:2690, 632:2969, 632:2838) -->
-    <div id="screen-personalize" class="root screen">
+    <!-- Personalization Screen (592:1570, 628:2143, 631:2690, 632:2969, 632:2838) - hidden until master is online -->
+    <div id="screen-personalize" class="root screen" hidden style="display: none;">
       <header class="welcome-section">
         <h1 class="welcome-title">Welcome!</h1>
         <p class="welcome-subtitle">Let's personalize your devices to respond to different emotional states.</p>

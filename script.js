@@ -14,7 +14,7 @@ const state = {
   emotion: 'positive',
   positive: { ...DEFAULT_STATE, hue: 30 },
   negative: { ...DEFAULT_STATE, hue: 210 },
-  devices: { master: true, light: true, sound: true },
+  devices: { master: false, light: true, sound: true },  // assume master offline until API responds (avoids blink)
   ignoreSensor: false,
 };
 
@@ -208,6 +208,16 @@ function initIgnoreSensorCheckbox() {
   });
 }
 
+function hideLoadingScreen() {
+  const el = document.getElementById('loading-screen');
+  if (!el) return;
+  el.classList.add('loading-done');
+  el.setAttribute('aria-busy', 'false');
+  el.addEventListener('transitionend', () => {
+    el.style.display = 'none';
+  }, { once: true });
+}
+
 function init() {
   loadFromStorage();
   initEmotionToggle();
@@ -216,7 +226,7 @@ function init() {
   initSaveButton();
   initIgnoreSensorCheckbox();
   applyStateToUI();
-  applyDeviceStatus();  // Apply default (devices online) immediately so offline banners stay hidden until API says otherwise
+  applyDeviceStatus();  // Show master-offline by default (avoids blink when master is offline)
   initDeviceStatus();
 }
 
@@ -236,6 +246,7 @@ async function initDeviceStatus() {
     syncToPhoton('negative', false);
     syncToPhoton('positive', false);
   }
+  hideLoadingScreen();
   setInterval(async () => {
     await fetchDeviceStatus();
     applyDeviceStatus();

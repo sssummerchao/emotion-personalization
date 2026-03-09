@@ -14,6 +14,30 @@ async function pingDevice(token, deviceId) {
   }
 }
 
+/** Fallback when Ping returns false: GET can confirm device is online (avoids false offline from Ping timeout). */
+const STALE_SEC = 120;
+async function getDeviceOnline(token, deviceId) {
+  if (!token || !deviceId) return null;
+  try {
+    const resp = await fetch(
+      `https://api.particle.io/v1/devices/${deviceId}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    const data = await resp.json().catch(() => ({}));
+    const online = data.online ?? data.connected;
+    if (typeof online !== 'boolean') return null;
+    if (!online) return false;
+    const lastHeard = data.last_heard || data.last_handshake_at;
+    if (lastHeard) {
+      const age = (Date.now() - new Date(lastHeard).getTime()) / 1000;
+      if (age > STALE_SEC) return false;
+    }
+    return true;
+  } catch {
+    return null;
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -54,13 +78,19 @@ export default async function handler(req, res) {
   if (masterResult.online !== null) masterOnline = masterResult.online;
   if (lightId === masterId) {
     lightOnline = masterOnline;
-  } else if (lightResult.online !== null) {
-    lightOnline = lightResult.online;
+  } else if (lightResult.online === true) {
+    lightOnline = true;
+  } else if (lightResult.online === false) {
+    const lightGet = await getDeviceOnline(token, lightId);
+    lightOnline = lightGet === true ? true : false;
   }
   if (soundId === masterId || !soundId) {
     soundOnline = masterOnline;
-  } else if (soundResult.online !== null) {
-    soundOnline = soundResult.online;
+  } else if (soundResult.online === true) {
+    soundOnline = true;
+  } else if (soundResult.online === false) {
+    const soundGet = await getDeviceOnline(token, soundId);
+    soundOnline = soundGet === true ? true : false;
   }
 
   const out = { master: masterOnline, light: lightOnline, sound: soundOnline };
