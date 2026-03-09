@@ -14,23 +14,6 @@ async function pingDevice(token, deviceId) {
   }
 }
 
-/** Fallback when Ping returns false: if GET says online, trust it (avoids false offline from Ping timeout). */
-async function getDeviceOnline(token, deviceId) {
-  if (!token || !deviceId) return null;
-  try {
-    const resp = await fetch(
-      `https://api.particle.io/v1/devices/${deviceId}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    const data = await resp.json().catch(() => ({}));
-    const online = data.online ?? data.connected;
-    if (typeof online !== 'boolean') return null;
-    return online;
-  } catch {
-    return null;
-  }
-}
-
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -74,16 +57,14 @@ export default async function handler(req, res) {
   } else if (lightResult.online === true) {
     lightOnline = true;
   } else if (lightResult.online === false) {
-    const lightGet = await getDeviceOnline(token, lightId);
-    lightOnline = lightGet === false ? false : true;  // assume online if GET can't confirm offline
+    lightOnline = false;
   }
   if (soundId === masterId || !soundId) {
     soundOnline = masterOnline;
   } else if (soundResult.online === true) {
     soundOnline = true;
   } else if (soundResult.online === false) {
-    const soundGet = await getDeviceOnline(token, soundId);
-    soundOnline = soundGet === false ? false : true;  // assume online if GET can't confirm offline
+    soundOnline = false;
   }
 
   const out = { master: masterOnline, light: lightOnline, sound: soundOnline };
