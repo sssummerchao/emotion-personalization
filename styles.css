@@ -540,8 +540,9 @@ body {
 }
 
 .offline-banner-text {
-  flex: 1;
-  min-width: 0;
+  flex: 1 1 0;
+  min-width: 230px;
+  max-width: 320px;
 }
 
 .offline-banner p {
@@ -558,7 +559,8 @@ body {
 }
 
 .offline-icon {
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 50px;
 }
 
 .offline-icon.light-icon {
