@@ -139,6 +139,7 @@ function applyDeviceStatus() {
   if (lightOnlineContent && lightBanner) {
     lightOnlineContent.style.display = light ? '' : 'none';
     lightBanner.hidden = light;
+    lightBanner.style.setProperty('display', light ? 'none' : 'flex', 'important');
     if (lightSection) {
       lightSection.classList.toggle('light-offline', !light);
       if (!light) {
@@ -160,6 +161,7 @@ function applyDeviceStatus() {
       soundOnlineContent.style.setProperty('display', 'none', 'important');
     }
     soundBanner.hidden = sound;
+    soundBanner.style.setProperty('display', sound ? 'none' : 'flex', 'important');
     if (soundSection) soundSection.classList.toggle('sound-offline', !sound);
   }
 
