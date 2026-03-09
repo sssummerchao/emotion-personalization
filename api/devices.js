@@ -14,8 +14,7 @@ async function pingDevice(token, deviceId) {
   }
 }
 
-/** Fallback when Ping returns false: GET can confirm device is online (avoids false offline from Ping timeout). */
-const STALE_SEC = 120;
+/** Fallback when Ping returns false: if GET says online, trust it (avoids false offline from Ping timeout). */
 async function getDeviceOnline(token, deviceId) {
   if (!token || !deviceId) return null;
   try {
@@ -26,13 +25,7 @@ async function getDeviceOnline(token, deviceId) {
     const data = await resp.json().catch(() => ({}));
     const online = data.online ?? data.connected;
     if (typeof online !== 'boolean') return null;
-    if (!online) return false;
-    const lastHeard = data.last_heard || data.last_handshake_at;
-    if (lastHeard) {
-      const age = (Date.now() - new Date(lastHeard).getTime()) / 1000;
-      if (age > STALE_SEC) return false;
-    }
-    return true;
+    return online;
   } catch {
     return null;
   }
