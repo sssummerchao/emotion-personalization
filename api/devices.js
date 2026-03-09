@@ -33,6 +33,7 @@ export default async function handler(req, res) {
   const masterParam = q.master;
   const lightParam = q.light;
   const soundParam = q.sound;
+  const debug = q.debug === '1' || q.debug === 'true';
 
   if (masterParam !== undefined || lightParam !== undefined || soundParam !== undefined) {
     return res.status(200).json({
@@ -60,9 +61,14 @@ export default async function handler(req, res) {
     if (soundResult !== null) soundOnline = soundResult;
   }
 
-  return res.status(200).json({
-    master: masterOnline,
-    light: lightOnline,
-    sound: soundOnline,
-  });
+  const out = { master: masterOnline, light: lightOnline, sound: soundOnline };
+  if (debug) {
+    out._debug = {
+      hasMasterId: !!masterId,
+      hasLightId: !!lightId,
+      hasSoundId: !!soundId,
+      hasToken: !!token,
+    };
+  }
+  return res.status(200).json(out);
 }
