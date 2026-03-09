@@ -204,6 +204,7 @@ function init() {
   initSaveButton();
   initIgnoreSensorCheckbox();
   applyStateToUI();
+  applyDeviceStatus();  // Apply default (devices online) immediately so offline banners stay hidden until API says otherwise
   initDeviceStatus();
 }
 
