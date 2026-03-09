@@ -1,7 +1,4 @@
-/**
- * Uses Particle Ping API - actively checks if device responds. Most reliable method.
- * GET /v1/devices/:id can report stale "online: true"; Ping actually reaches the device.
- */
+/** Ping: reliable for offline, but can timeout and wrongly return false for online devices. */
 async function pingDevice(token, deviceId) {
   if (!token || !deviceId) return { online: null };
   try {
@@ -11,11 +8,34 @@ async function pingDevice(token, deviceId) {
     );
     const data = await resp.json().catch(() => ({}));
     if (typeof data.online === 'boolean') return { online: data.online };
-    // Particle may return { ok: false } or error when offline
     if (resp.status === 404 || data.error) return { online: false };
     return { online: null };
   } catch {
     return { online: null };
+  }
+}
+
+/** GET device info: fast, good for online detection. When online=true + recent last_heard, trust it. */
+const STALE_SEC = 120;
+async function getDeviceOnline(token, deviceId) {
+  if (!token || !deviceId) return null;
+  try {
+    const resp = await fetch(
+      `https://api.particle.io/v1/devices/${deviceId}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    const data = await resp.json().catch(() => ({}));
+    const online = data.online ?? data.connected;
+    if (typeof online !== 'boolean') return null;
+    if (!online) return false;
+    const lastHeard = data.last_heard || data.last_handshake_at;
+    if (lastHeard) {
+      const age = (Date.now() - new Date(lastHeard).getTime()) / 1000;
+      if (age > STALE_SEC) return false;
+    }
+    return true;
+  } catch {
+    return null;
   }
 }
 
@@ -49,24 +69,23 @@ export default async function handler(req, res) {
   let lightOnline = true;
   let soundOnline = true;
 
-  // Ping devices in parallel. When sound/light share master's device ID, use master's result.
-  const soundPingId = soundId && soundId !== masterId ? soundId : null;
-  const [masterResult, lightResult, soundResult] = await Promise.all([
+  // Master: Ping. Light/sound: GET (faster, more reliable for online detection; Ping can timeout).
+  const [masterResult, lightGet, soundGet] = await Promise.all([
     pingDevice(token, masterId),
-    lightId && lightId !== masterId ? pingDevice(token, lightId) : { online: null },
-    soundPingId ? pingDevice(token, soundPingId) : { online: null },
+    lightId && lightId !== masterId ? getDeviceOnline(token, lightId) : Promise.resolve(null),
+    soundId && soundId !== masterId ? getDeviceOnline(token, soundId) : Promise.resolve(null),
   ]);
 
   if (masterResult.online !== null) masterOnline = masterResult.online;
   if (lightId === masterId) {
     lightOnline = masterOnline;
-  } else if (lightResult.online !== null) {
-    lightOnline = lightResult.online;
+  } else if (lightGet !== null) {
+    lightOnline = lightGet;
   }
   if (soundId === masterId || !soundId) {
-    soundOnline = masterOnline;  // Sound often runs on master; if same ID or unset, use master status
-  } else if (soundResult.online !== null) {
-    soundOnline = soundResult.online;
+    soundOnline = masterOnline;
+  } else if (soundGet !== null) {
+    soundOnline = soundGet;
   }
 
   const out = { master: masterOnline, light: lightOnline, sound: soundOnline };
@@ -77,8 +96,8 @@ export default async function handler(req, res) {
       hasSoundId: !!soundId,
       hasToken: !!token,
       master: masterResult.online,
-      light: lightResult.online,
-      sound: soundResult.online,
+      light: lightGet,
+      sound: soundGet,
     };
   }
   return res.status(200).json(out);
