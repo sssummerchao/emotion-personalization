@@ -257,7 +257,7 @@ function hslToRgb(h, s, l) {
 }
 
 function updateHuePreview(hue) {
-  // Static color at 20% opacity (match Figma 628:2216). Firmware: light 40%/45%, saturated 95%/75%.
+  // White base + 20% hue overlay. Firmware: light 40%/45%, saturated 95%/75%.
   const light = hslToRgb(hue, 40, 45);
   const lightSection = document.getElementById('light-section');
   if (lightSection) {
