@@ -83,7 +83,7 @@ body {
   min-height: 100vh;
   background: var(--color-bg);
   position: relative;
-  padding: 24px 8px 40px;
+  padding: 24px 2px 40px;
 }
 
 /* ============================================
