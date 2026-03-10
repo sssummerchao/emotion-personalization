@@ -191,7 +191,7 @@ body.questions-page {
 .card {
   border: 1px solid var(--color-primary-border);
   border-radius: var(--radius-sm);
-  margin-bottom: 24px;
+  margin-bottom: 12px;
   overflow: hidden;
 }
 
@@ -207,6 +207,9 @@ body.questions-page {
 
 .personalize-subsection {
   padding: 32px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 /* Light subsection: white base + 20% hue overlay on top (Figma 628:2216) */
