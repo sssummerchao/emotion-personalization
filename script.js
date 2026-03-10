@@ -32,6 +32,7 @@ const TRACKS = {
 };
 
 const POLL_INTERVAL_MS = 10000;
+const INIT_FETCH_TIMEOUT_MS = 8000;  // hide loading screen after this even if API hangs
 
 function loadFromStorage() {
   try {
@@ -226,7 +227,12 @@ async function initDeviceStatus() {
       sound: params.get('sound') === null ? true : parseBool(params.get('sound')),
     };
   }
-  await fetchDeviceStatus();
+  const fetchWithTimeout = () =>
+    Promise.race([
+      fetchDeviceStatus(),
+      new Promise((resolve) => setTimeout(resolve, INIT_FETCH_TIMEOUT_MS)),
+    ]);
+  await fetchWithTimeout();
   applyDeviceStatus();
   if (state.devices.master) {
     syncToPhoton('negative', false);
