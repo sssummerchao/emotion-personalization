@@ -141,9 +141,7 @@ function applyDeviceStatus() {
     lightBanner.style.setProperty('display', light ? 'none' : 'flex', 'important');
     if (lightSection) {
       lightSection.classList.toggle('light-offline', !light);
-      if (!light) {
-        lightSection.style.background = '';
-      } else {
+      if (light) {
         updateHuePreview(getCurrentState().hue);
       }
     }
@@ -272,13 +270,6 @@ function updateHuePreview(hue) {
     gradientEl.style.backgroundSize = '200% 100%';
   }
   updateSaturationPreview(hue, s);
-  const lightSection = document.getElementById('light-section');
-  if (lightSection && !lightSection.classList.contains('light-offline')) {
-    const satTint = Math.max(25, s * 0.5);
-    const tint1 = `hsla(${hue}, ${satTint}%, 95%, 0.9)`;
-    const tint2 = `hsla(${hue}, ${Math.max(20, satTint - 5)}%, 92%, 0.8)`;
-    lightSection.style.background = `linear-gradient(180deg, ${tint1} 0%, ${tint2} 100%)`;
-  }
 }
 
 function updateSaturationPreview(hue, saturation) {
@@ -357,13 +348,6 @@ function initColorSwitcher() {
       const saturation = parseInt(satSlider.value, 10);
       const hue = parseInt(document.getElementById('hue-slider')?.value || 30, 10);
       updateSaturationPreview(hue, saturation);
-      const lightSection = document.getElementById('light-section');
-      if (lightSection && !lightSection.classList.contains('light-offline')) {
-        const satTint = Math.max(25, saturation * 0.5);
-        const tint1 = `hsla(${hue}, ${satTint}%, 95%, 0.9)`;
-        const tint2 = `hsla(${hue}, ${Math.max(20, satTint - 5)}%, 92%, 0.8)`;
-        lightSection.style.background = `linear-gradient(180deg, ${tint1} 0%, ${tint2} 100%)`;
-      }
     });
     satSlider.addEventListener('change', () => {
       const saturation = parseInt(satSlider.value, 10);

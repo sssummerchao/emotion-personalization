@@ -206,21 +206,16 @@ body.questions-page {
 }
 
 .personalize-subsection {
-  padding: 48px 14px;
+  padding: 32px 14px;
 }
 
-/* Light subsection: gradient when online (628:2216) */
+/* Light subsection: same as sound */
 .light-subsection {
-  background: linear-gradient(
-    180deg,
-    rgba(213, 113, 235, 0.2) 0%,
-    rgba(154, 4, 136, 0.2) 100%
-  ),
-  var(--color-white);
+  background: transparent;
 }
 
 .light-subsection.light-offline {
-  background: #e4e9f1 !important;
+  background: transparent !important;
 }
 
 /* Sound subsection: card bg #e4e9f1 (628:2167) */
