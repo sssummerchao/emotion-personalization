@@ -144,7 +144,7 @@ function applyDeviceStatus() {
       if (!light) {
         lightSection.style.background = '';
       } else {
-        updateColorPreview(getCurrentState().hue, getCurrentState().saturation);
+        updateHuePreview(getCurrentState().hue);
       }
     }
   }
