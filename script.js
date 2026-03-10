@@ -257,8 +257,8 @@ function hslToRgb(h, s, l) {
 }
 
 function updateHuePreview(hue) {
-  // White base + 20% hue overlay. Firmware: light 25%/25%, saturated 95%/75%.
-  const light = hslToRgb(hue, 25, 25);
+  // White base + 20% hue overlay. Firmware: light 30%/40%, saturated 95%/75%.
+  const light = hslToRgb(hue, 30, 40);
   const lightSection = document.getElementById('light-section');
   if (lightSection) {
     lightSection.style.setProperty('--light-bg-color', `rgba(${light[0]}, ${light[1]}, ${light[2]}, 0.2)`);

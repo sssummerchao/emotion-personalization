@@ -323,8 +323,8 @@ body.questions-page {
 .hue-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 24px;
-  height: 24px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: var(--color-white);
   border: 2px solid rgba(0, 0, 0, 0.15);
@@ -338,8 +338,8 @@ body.questions-page {
 }
 
 .hue-slider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: var(--color-white);
   border: 2px solid rgba(0, 0, 0, 0.15);
