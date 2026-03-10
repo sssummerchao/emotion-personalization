@@ -257,13 +257,11 @@ function hslToRgb(h, s, l) {
 }
 
 function updateHuePreview(hue) {
-  // Match firmware: light (40% sat, 45% lightness), saturated (95% sat, 75% lightness)
+  // Static color at 20% opacity (match Figma 628:2216). Firmware: light 40%/45%, saturated 95%/75%.
   const light = hslToRgb(hue, 40, 45);
-  const saturated = hslToRgb(hue, 95, 75);
   const lightSection = document.getElementById('light-section');
   if (lightSection) {
-    lightSection.style.setProperty('--light-bg-light', `rgb(${light[0]}, ${light[1]}, ${light[2]})`);
-    lightSection.style.setProperty('--light-bg-saturated', `rgb(${saturated[0]}, ${saturated[1]}, ${saturated[2]})`);
+    lightSection.style.setProperty('--light-bg-color', `rgba(${light[0]}, ${light[1]}, ${light[2]}, 0.2)`);
   }
 }
 

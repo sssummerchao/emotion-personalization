@@ -209,16 +209,10 @@ body.questions-page {
   padding: 32px 14px;
 }
 
-/* Light subsection: dynamic color-changing background (matches Figma 628:2216) */
+/* Light subsection: static tinted background, 20% opacity (Figma 628:2216) */
 .light-subsection {
   background-color: var(--light-bg-color, #e4e9f1);
   min-height: 140px;
-  animation: light-section-color-cycle 4s ease-in-out infinite;
-}
-
-@keyframes light-section-color-cycle {
-  0%, 100% { background-color: var(--light-bg-light, #e4e9f1); }
-  50% { background-color: var(--light-bg-saturated, #e4e9f1); }
 }
 
 .light-subsection.light-offline {
