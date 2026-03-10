@@ -257,14 +257,13 @@ function hslToRgb(h, s, l) {
 }
 
 function updateHuePreview(hue) {
-  const light = hslToRgb(hue, 60, 50);
-  const saturated = hslToRgb(hue, 80, 70);
-  const gradientEl = document.getElementById('hue-preview-gradient');
-  if (gradientEl) {
-    const lightColor = `rgb(${light[0]}, ${light[1]}, ${light[2]})`;
-    const satColor = `rgb(${saturated[0]}, ${saturated[1]}, ${saturated[2]})`;
-    gradientEl.style.background = `linear-gradient(90deg, ${lightColor} 0%, ${satColor} 25%, ${lightColor} 50%, ${satColor} 75%, ${lightColor} 100%)`;
-    gradientEl.style.backgroundSize = '200% 100%';
+  // Match firmware: light (40% sat, 45% lightness), saturated (95% sat, 75% lightness)
+  const light = hslToRgb(hue, 40, 45);
+  const saturated = hslToRgb(hue, 95, 75);
+  const lightSection = document.getElementById('light-section');
+  if (lightSection) {
+    lightSection.style.setProperty('--light-bg-light', `rgb(${light[0]}, ${light[1]}, ${light[2]})`);
+    lightSection.style.setProperty('--light-bg-saturated', `rgb(${saturated[0]}, ${saturated[1]}, ${saturated[2]})`);
   }
 }
 
