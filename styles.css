@@ -204,8 +204,8 @@ body {
 .light-subsection {
   background: linear-gradient(
     180deg,
-    rgba(213, 113, 235, 0.2) 0%,
-    rgba(154, 4, 136, 0.2) 100%
+    rgba(213, 113, 235, 0.4) 0%,
+    rgba(154, 4, 136, 0.4) 100%
   ),
   var(--color-white);
 }
