@@ -7,14 +7,13 @@
 
 const DEFAULT_STATE = {
   hue: 30,
-  saturation: 80,
   selectedTrack: null,
 };
 
 const state = {
   emotion: 'positive',
-  positive: { ...DEFAULT_STATE, hue: 30, saturation: 80 },
-  negative: { ...DEFAULT_STATE, hue: 210, saturation: 80 },
+  positive: { ...DEFAULT_STATE, hue: 30 },
+  negative: { ...DEFAULT_STATE, hue: 210 },
   devices: { master: false, light: true, sound: true },  // assume master offline until API responds (avoids blink)
 };
 
@@ -178,7 +177,6 @@ function syncToPhoton(emotion, personalizing = false) {
   const payload = {
     emotion,
     hue: s.hue,
-    saturation: s.saturation,
     selectedTrack: s.selectedTrack || '',
     personalizing: !!personalizing,
   };
@@ -259,7 +257,6 @@ function hslToRgb(h, s, l) {
 }
 
 function updateHuePreview(hue) {
-  const s = getCurrentState().saturation;
   const light = hslToRgb(hue, 60, 50);
   const saturated = hslToRgb(hue, 80, 70);
   const gradientEl = document.getElementById('hue-preview-gradient');
@@ -269,32 +266,14 @@ function updateHuePreview(hue) {
     gradientEl.style.background = `linear-gradient(90deg, ${lightColor} 0%, ${satColor} 25%, ${lightColor} 50%, ${satColor} 75%, ${lightColor} 100%)`;
     gradientEl.style.backgroundSize = '200% 100%';
   }
-  updateSaturationPreview(hue, s);
-}
-
-function updateSaturationPreview(hue, saturation) {
-  const pastel = hslToRgb(hue, 25, 90);
-  const vivid = hslToRgb(hue, 90, 65);
-  const pastelColor = `rgb(${pastel[0]}, ${pastel[1]}, ${pastel[2]})`;
-  const vividColor = `rgb(${vivid[0]}, ${vivid[1]}, ${vivid[2]})`;
-  const gradient = `linear-gradient(90deg, ${pastelColor} 0%, ${vividColor} 100%)`;
-  const satSlider = document.getElementById('saturation-slider');
-  const gradientEl = document.getElementById('saturation-preview-gradient');
-  if (satSlider) satSlider.style.background = gradient;
-  if (gradientEl) gradientEl.style.background = gradient;
 }
 
 function applyStateToUI() {
   const s = getCurrentState();
   const hueSlider = document.getElementById('hue-slider');
-  const satSlider = document.getElementById('saturation-slider');
   if (hueSlider) {
     hueSlider.value = s.hue;
     updateHuePreview(s.hue);
-  }
-  if (satSlider) {
-    satSlider.value = s.saturation ?? 80;
-    updateSaturationPreview(s.hue, s.saturation ?? 80);
   }
   document.querySelectorAll('.track-chip').forEach((el) => {
     el.classList.toggle('selected', el.dataset.track === s.selectedTrack);
@@ -332,28 +311,15 @@ function initEmotionToggle() {
 
 function initColorSwitcher() {
   const hueSlider = document.getElementById('hue-slider');
-  const satSlider = document.getElementById('saturation-slider');
-  if (hueSlider) {
-    hueSlider.addEventListener('input', () => {
-      const hue = parseInt(hueSlider.value, 10);
-      updateHuePreview(hue);
-    });
-    hueSlider.addEventListener('change', () => {
-      const hue = parseInt(hueSlider.value, 10);
-      setCurrentState({ hue });
-    });
-  }
-  if (satSlider) {
-    satSlider.addEventListener('input', () => {
-      const saturation = parseInt(satSlider.value, 10);
-      const hue = parseInt(document.getElementById('hue-slider')?.value || 30, 10);
-      updateSaturationPreview(hue, saturation);
-    });
-    satSlider.addEventListener('change', () => {
-      const saturation = parseInt(satSlider.value, 10);
-      setCurrentState({ saturation });
-    });
-  }
+  if (!hueSlider) return;
+  hueSlider.addEventListener('input', () => {
+    const hue = parseInt(hueSlider.value, 10);
+    updateHuePreview(hue);
+  });
+  hueSlider.addEventListener('change', () => {
+    const hue = parseInt(hueSlider.value, 10);
+    setCurrentState({ hue });
+  });
 }
 
 function initMusicPlayer() {

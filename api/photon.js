@@ -38,7 +38,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid JSON body' });
     }
   }
-  const { action, emotion, hue, saturation, selectedTrack, personalizing, previewDurationSec } = body || {};
+  const { action, emotion, hue, selectedTrack, personalizing, previewDurationSec } = body || {};
 
   if (action === 'save') {
     const arg = JSON.stringify({ save: true });
@@ -72,11 +72,9 @@ export default async function handler(req, res) {
 
   // Track: send both ID (0001) and number (1) for DFPlayer play(n)
   const trackNum = selectedTrack ? parseInt(selectedTrack, 10) || 1 : 1;
-  const sat = saturation !== undefined ? Math.min(100, Math.max(0, parseInt(saturation, 10) || 80)) : 80;
   const argObj = {
     e: emotion,
     h: hue,
-    s: sat,
     t: selectedTrack || '',
     n: trackNum,
     m: 50,
