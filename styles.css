@@ -352,6 +352,56 @@ body.questions-page {
   overflow: hidden;
 }
 
+/* Saturation: pastel (light) to vivid - light end not pure white */
+.saturation-picker-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.saturation-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 27px;
+  border-radius: var(--radius-pill);
+  outline: none;
+  cursor: pointer;
+}
+
+.saturation-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-white);
+  border: 2px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  cursor: grab;
+  transition: transform 0.15s ease;
+}
+
+.saturation-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.08);
+}
+
+.saturation-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-white);
+  border: 2px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  cursor: grab;
+}
+
+.saturation-preview-gradient {
+  height: 0;
+  overflow: hidden;
+}
+
 /* ============================================
    Sound Section - Chip Style
    ============================================ */
