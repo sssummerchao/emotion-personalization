@@ -212,10 +212,11 @@ body.questions-page {
   justify-content: center;
 }
 
-/* Light subsection: white base + 20% hue overlay on top (Figma 628:2216) */
+/* Light subsection: white base (#fff) + 20% hue overlay — not card gray #e4e9f1 (Figma 628:2216) */
 .light-subsection {
   --light-overlay: var(--light-bg-color, rgba(213, 113, 235, 0.2));
-  background: linear-gradient(var(--light-overlay), var(--light-overlay)), #ffffff;
+  background-color: #ffffff;
+  background-image: linear-gradient(var(--light-overlay), var(--light-overlay));
   min-height: 207px;
 }
 
