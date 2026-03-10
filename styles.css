@@ -209,9 +209,10 @@ body.questions-page {
   padding: 32px 14px;
 }
 
-/* Light subsection: same as sound */
+/* Light subsection: same as sound, fixed height so offline matches online */
 .light-subsection {
   background: transparent;
+  min-height: 140px;
 }
 
 .light-subsection.light-offline {
