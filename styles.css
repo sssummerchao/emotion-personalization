@@ -83,7 +83,7 @@ body {
   min-height: 100vh;
   background: var(--color-bg);
   position: relative;
-  padding: 24px 24px 40px;
+  padding: 24px 14px 40px;
 }
 
 /* ============================================
@@ -197,7 +197,7 @@ body {
 }
 
 .personalize-subsection {
-  padding: 24px 24px;
+  padding: 24px 14px;
 }
 
 /* Light subsection: gradient when online (628:2216) */
@@ -534,7 +534,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 24px;
+  padding: 24px 14px;
   gap: 16px;
   min-height: 143px;
 }
