@@ -298,7 +298,7 @@ body.questions-page {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 27px;
+  height: 40px;
   border-radius: var(--radius-pill);
   background: linear-gradient(
     to right,
