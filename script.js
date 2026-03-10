@@ -15,7 +15,6 @@ const state = {
   positive: { ...DEFAULT_STATE, hue: 30 },
   negative: { ...DEFAULT_STATE, hue: 210 },
   devices: { master: false, light: true, sound: true },  // assume master offline until API responds (avoids blink)
-  ignoreSensor: false,
 };
 
 // Track metadata for audio files
@@ -40,7 +39,6 @@ function loadFromStorage() {
       const parsed = JSON.parse(saved);
       if (parsed.positive) state.positive = { ...DEFAULT_STATE, ...parsed.positive };
       if (parsed.negative) state.negative = { ...DEFAULT_STATE, ...parsed.negative };
-      if (typeof parsed.ignoreSensor === 'boolean') state.ignoreSensor = parsed.ignoreSensor;
     }
   } catch (e) {
     console.warn('Could not load saved state:', e);
@@ -52,7 +50,6 @@ function saveToStorage() {
     localStorage.setItem('photon-state', JSON.stringify({
       positive: state.positive,
       negative: state.negative,
-      ignoreSensor: state.ignoreSensor,
     }));
   } catch (e) {
     console.warn('Could not save state:', e);
@@ -183,7 +180,6 @@ function syncToPhoton(emotion, personalizing = false) {
     hue: s.hue,
     selectedTrack: s.selectedTrack || '',
     personalizing: !!personalizing,
-    ignoreSensor: !!state.ignoreSensor,
   };
   if (personalizing) payload.previewDurationSec = 60;  // 1 minute for admin
   fetch('/api/photon', {
@@ -195,19 +191,6 @@ function syncToPhoton(emotion, personalizing = false) {
       if (!r.ok) return r.json().then((d) => Promise.reject(d));
     })
     .catch((err) => console.warn('Photon sync failed:', err?.error || err));
-}
-
-function initIgnoreSensorCheckbox() {
-  const cb = document.getElementById('ignore-sensor');
-  if (!cb) return;
-  cb.checked = state.ignoreSensor;
-  cb.addEventListener('change', () => {
-    state.ignoreSensor = cb.checked;
-    saveToStorage();
-    if (state.devices.master) {
-      syncToPhoton(state.emotion, true);
-    }
-  });
 }
 
 function hideLoadingScreen() {
@@ -226,7 +209,6 @@ function init() {
   initColorSwitcher();
   initMusicPlayer();
   initSaveButton();
-  initIgnoreSensorCheckbox();
   applyStateToUI();
   applyDeviceStatus();  // Show master-offline by default (avoids blink when master is offline)
   initDeviceStatus();
@@ -386,7 +368,7 @@ function initSaveButton() {
     fetch('/api/photon', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'save', ignoreSensor: !!state.ignoreSensor }),
+      body: JSON.stringify({ action: 'save' }),
     })
       .then((r) => r.json().catch(() => ({})))
       .then((data) => {

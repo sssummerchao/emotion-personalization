@@ -38,10 +38,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid JSON body' });
     }
   }
-  const { action, emotion, hue, selectedTrack, personalizing, ignoreSensor, previewDurationSec } = body || {};
+  const { action, emotion, hue, selectedTrack, personalizing, previewDurationSec } = body || {};
 
   if (action === 'save') {
-    const arg = JSON.stringify({ save: true, ignoreSensor: !!ignoreSensor });
+    const arg = JSON.stringify({ save: true });
     try {
       const resp = await fetch(
         `https://api.particle.io/v1/devices/${deviceId}/setState`,
@@ -79,7 +79,6 @@ export default async function handler(req, res) {
     n: trackNum,
     m: 50,
     p: !!personalizing,
-    ignoreSensor: !!ignoreSensor,
   };
   if (personalizing && previewDurationSec) argObj.d = previewDurationSec;  // 1 min preview for admin
   const arg = JSON.stringify(argObj);
