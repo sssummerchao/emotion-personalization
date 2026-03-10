@@ -534,15 +534,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 48px 24px 24px;
+  padding: 24px 24px;
   gap: 16px;
   min-height: 143px;
 }
 
+
 .offline-banner-text {
   flex: 1 1 0;
-  min-width: 230px;
-  max-width: 320px;
+  min-width: 0;
+  max-width: none;
 }
 
 .offline-banner p {
@@ -559,8 +560,7 @@ body {
 }
 
 .offline-icon {
-  flex-shrink: 1;
-  min-width: 50px;
+  flex-shrink: 0;
 }
 
 .offline-icon.light-icon {
