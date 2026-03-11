@@ -3,7 +3,19 @@
  * Each emotion state (Positive/Negative) has its own color and music.
  * Selections are remembered per state and persisted in localStorage.
  * Device status (master, light, sound) controls which screen and banners to show.
+ * data-setup on body: 0 = Family A (default), 1 = Family B. Separate URLs per family.
  */
+
+function getSetupId() {
+  const body = document.body;
+  const setup = body?.getAttribute?.('data-setup');
+  if (setup !== null && setup !== undefined) return parseInt(setup, 10) || 0;
+  const params = new URLSearchParams(window.location.search);
+  const q = params.get('setup');
+  if (q !== null) return parseInt(q, 10) || 0;
+  if (window.location.pathname.includes('family-b')) return 1;
+  return 0;
+}
 
 const DEFAULT_STATE = {
   hue: 30,
@@ -35,7 +47,8 @@ const INIT_FETCH_TIMEOUT_MS = 8000;  // hide loading screen after this even if A
 
 function loadFromStorage() {
   try {
-    const saved = localStorage.getItem('photon-state');
+    const key = 'photon-state-' + getSetupId();
+    const saved = localStorage.getItem(key);
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed.positive) state.positive = { ...DEFAULT_STATE, ...parsed.positive };
@@ -48,7 +61,8 @@ function loadFromStorage() {
 
 function saveToStorage() {
   try {
-    localStorage.setItem('photon-state', JSON.stringify({
+    const key = 'photon-state-' + getSetupId();
+    localStorage.setItem(key, JSON.stringify({
       positive: state.positive,
       negative: state.negative,
     }));
@@ -78,11 +92,11 @@ async function fetchDeviceStatus() {
   const hasParams = params.get('master') !== null || params.get('light') !== null || params.get('sound') !== null;
 
   try {
-    const q = {};
+    const q = { setup: getSetupId() };
     if (params.get('master') !== null) q.master = params.get('master');
     if (params.get('light') !== null) q.light = params.get('light');
     if (params.get('sound') !== null) q.sound = params.get('sound');
-    const query = Object.keys(q).length ? '?' + new URLSearchParams(q).toString() : '';
+    const query = '?' + new URLSearchParams(q).toString();
     const r = await fetch('/api/devices' + query);
     if (!r.ok) throw new Error('API not ok');
     const data = await r.json();
@@ -175,6 +189,7 @@ function syncToPhoton(emotion, personalizing = false) {
   if (!state.devices.master) return;
   const s = state[emotion];
   const payload = {
+    setup: getSetupId(),
     emotion,
     hue: s.hue,
     selectedTrack: s.selectedTrack || '',
@@ -363,7 +378,7 @@ function initSaveButton() {
     fetch('/api/photon', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'save' }),
+      body: JSON.stringify({ action: 'save', setup: getSetupId() }),
     })
       .then((r) => r.json().catch(() => ({})))
       .then((data) => {

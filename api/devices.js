@@ -20,9 +20,16 @@ export default async function handler(req, res) {
   }
 
   const token = process.env.PARTICLE_ACCESS_TOKEN;
-  const masterId = process.env.PARTICLE_DEVICE_ID;
-  const lightId = process.env.PARTICLE_LIGHT_DEVICE_ID;
-  const soundId = process.env.PARTICLE_SOUND_DEVICE_ID;
+  const setup = parseInt(req.query?.setup, 10) || 0;
+  const masterId = setup === 1
+    ? process.env.PARTICLE_DEVICE_ID_SETUP1
+    : process.env.PARTICLE_DEVICE_ID;
+  const lightId = setup === 1
+    ? process.env.PARTICLE_LIGHT_DEVICE_ID_SETUP1
+    : process.env.PARTICLE_LIGHT_DEVICE_ID;
+  const soundId = setup === 1
+    ? process.env.PARTICLE_SOUND_DEVICE_ID_SETUP1
+    : process.env.PARTICLE_SOUND_DEVICE_ID;
 
   const q = req.query;
   const parseBool = (v) => v !== '0' && v !== 'false';
