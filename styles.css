@@ -217,7 +217,7 @@ body.questions-page {
   --light-overlay: var(--light-bg-color, rgba(213, 113, 235, 0.2));
   background-color: #ffffff;
   background-image: linear-gradient(var(--light-overlay), var(--light-overlay));
-  min-height: 207px;
+  min-height: 180px;
 }
 
 .light-subsection.light-offline {
@@ -227,7 +227,7 @@ body.questions-page {
 /* Sound subsection: card bg #e4e9f1 (628:2167), same min-height as light for consistency */
 .sound-subsection {
   background: transparent;
-  min-height: 207px;
+  min-height: 180px;
 }
 
 .sound-subsection.sound-offline {
@@ -362,7 +362,7 @@ body.questions-page {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 4px 10px;
+  padding: 8px 12px;
   border: 1px solid var(--color-primary-border);
   border-radius: var(--radius-pill);
   background: var(--color-white);
