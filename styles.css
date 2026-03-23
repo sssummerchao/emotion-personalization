@@ -362,7 +362,7 @@ body.questions-page {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
+  padding: 10px 12px;
   border: 1px solid var(--color-primary-border);
   border-radius: var(--radius-pill);
   background: var(--color-white);
