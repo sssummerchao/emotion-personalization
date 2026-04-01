@@ -1,3 +1,5 @@
+import { getLightDeviceId, getMasterDeviceId, getSoundDeviceId } from './deviceEnv.js';
+
 async function pingDevice(token, deviceId) {
   if (!token || !deviceId) return { online: null };
   try {
@@ -21,15 +23,9 @@ export default async function handler(req, res) {
 
   const token = process.env.PARTICLE_ACCESS_TOKEN;
   const setup = parseInt(req.query?.setup, 10) || 0;
-  const masterId = setup === 1
-    ? process.env.PARTICLE_DEVICE_ID_SETUP1
-    : process.env.PARTICLE_DEVICE_ID;
-  const lightId = setup === 1
-    ? process.env.PARTICLE_LIGHT_DEVICE_ID_SETUP1
-    : process.env.PARTICLE_LIGHT_DEVICE_ID;
-  const soundId = setup === 1
-    ? process.env.PARTICLE_SOUND_DEVICE_ID_SETUP1
-    : process.env.PARTICLE_SOUND_DEVICE_ID;
+  const masterId = getMasterDeviceId(setup);
+  const lightId = getLightDeviceId(setup);
+  const soundId = getSoundDeviceId(setup);
 
   const q = req.query;
   const parseBool = (v) => v !== '0' && v !== 'false';

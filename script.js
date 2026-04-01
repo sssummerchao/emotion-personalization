@@ -3,7 +3,7 @@
  * Each emotion state (Positive/Negative) has its own color and music.
  * Selections are remembered per state and persisted in localStorage.
  * Device status (master, light, sound) controls which screen and banners to show.
- * data-setup on body: 0 = Family A (default), 1 = Family B. Separate URLs per family.
+ * data-setup on body: 0–3 = Families A–D. Separate URLs per family.
  */
 
 function getSetupId() {
@@ -13,7 +13,10 @@ function getSetupId() {
   const params = new URLSearchParams(window.location.search);
   const q = params.get('setup');
   if (q !== null) return parseInt(q, 10) || 0;
-  if (window.location.pathname.includes('family-b')) return 1;
+  const path = window.location.pathname;
+  if (path.includes('family-b')) return 1;
+  if (path.includes('family-c')) return 2;
+  if (path.includes('family-d')) return 3;
   return 0;
 }
 
@@ -195,7 +198,7 @@ function syncToPhoton(emotion, personalizing = false) {
     selectedTrack: s.selectedTrack || '',
     personalizing: !!personalizing,
   };
-  if (personalizing) payload.previewDurationSec = 60;  // 1 minute for admin
+  if (personalizing) payload.previewDurationSec = 20;  // 20 seconds for admin
   fetch('/api/photon', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

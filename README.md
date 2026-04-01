@@ -20,7 +20,7 @@ The web app syncs color, music, and motor settings to your Particle device. Set 
    - `PARTICLE_DEVICE_ID` = your device ID
 4. Redeploy after adding variables
 
-Flash the updated firmware to your device so it has the `setState` cloud function.
+Flash the updated firmware to your device so it has the `setState` cloud function. For the calibration page, flash the Light and Audio devices with firmware that exposes `Particle.variable("lux")`, `Particle.variable("mic")`, `Particle.variable("ambient")`, and `Particle.function("setThresholds", ...)`.
 
 ### Three-device family (Master / Light / Audio)
 
@@ -28,22 +28,31 @@ The firmware can be built as three separate roles so one **Master** device (touc
 
 - **Web** always talks only to the **Master** device.
 
-### Separate URLs per family (Family A / Family B)
+### Separate URLs per family (A–D)
 
-- **index.html** (or `/`) = Family A — uses setup 0
-- **family-b.html** (or `/family-b.html`) = Family B — uses setup 1
+- **index.html** (or `/`) = Family A — setup `0`
+- **family-b.html** = Family B — setup `1`
+- **family-c.html** = Family C — setup `2`
+- **family-d.html** = Family D — setup `3`
+- **calibration.html** = Sensor calibration — use `?setup=0`–`3` to match the family (default `0`)
 
 **Vercel environment variables:**
 
 | Variable | Family | Description |
 |----------|--------|-------------|
-| `PARTICLE_ACCESS_TOKEN` | Both | Particle API token |
-| `PARTICLE_DEVICE_ID` | A | Master device ID (Family A) |
-| `PARTICLE_LIGHT_DEVICE_ID` | A | Light device ID (optional, for device status) |
-| `PARTICLE_SOUND_DEVICE_ID` | A | Audio device ID (optional) |
-| `PARTICLE_DEVICE_ID_SETUP1` | B | Master device ID (Family B) |
-| `PARTICLE_LIGHT_DEVICE_ID_SETUP1` | B | Light device ID (optional) |
-| `PARTICLE_SOUND_DEVICE_ID_SETUP1` | B | Audio device ID (optional) |
+| `PARTICLE_ACCESS_TOKEN` | All | Particle API token |
+| `PARTICLE_DEVICE_ID` | A | Master device ID |
+| `PARTICLE_LIGHT_DEVICE_ID` | A | Light device ID (required for calibration, optional for device status) |
+| `PARTICLE_SOUND_DEVICE_ID` | A | Audio device ID (required for calibration, optional for device status) |
+| `PARTICLE_DEVICE_ID_SETUP1` | B | Master device ID |
+| `PARTICLE_LIGHT_DEVICE_ID_SETUP1` | B | Light device ID (required for calibration) |
+| `PARTICLE_SOUND_DEVICE_ID_SETUP1` | B | Audio device ID (required for calibration) |
+| `PARTICLE_DEVICE_ID_SETUP2` | C | Master device ID |
+| `PARTICLE_LIGHT_DEVICE_ID_SETUP2` | C | Light device ID |
+| `PARTICLE_SOUND_DEVICE_ID_SETUP2` | C | Audio device ID |
+| `PARTICLE_DEVICE_ID_SETUP3` | D | Master device ID |
+| `PARTICLE_LIGHT_DEVICE_ID_SETUP3` | D | Light device ID |
+| `PARTICLE_SOUND_DEVICE_ID_SETUP3` | D | Audio device ID |
 
 - Build and flash each role — see `../FLASHING.md` in the project root. Use `./build-all.sh` for all setups.
 - Master publishes `photon/state/SETUP_ID` (private); Light and Audio subscribe and drive outputs from that state.

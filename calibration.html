@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photon Calibration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .calibration-page body { overflow: auto; }
+    .calibration-card { margin-bottom: 24px; border: none; }
+    .sensor-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
+    .sensor-label { font-weight: 500; color: var(--color-primary); }
+    .sensor-value { font-variant-numeric: tabular-nums; font-weight: 600; }
+    .threshold-section { margin-top: 16px; }
+    .threshold-section h3 { font-size: 14px; font-weight: 600; color: var(--color-primary); margin-bottom: 12px; }
+    .threshold-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .threshold-row label { min-width: 100px; font-size: 14px; }
+    .threshold-row input { flex: 1; max-width: 120px; padding: 8px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+    .calibration-nav { margin-top: 24px; }
+    .calibration-nav a { color: var(--color-primary); text-decoration: none; font-size: 14px; }
+    .calibration-nav a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body class="calibration-page" data-setup="0">
+  <div class="app">
+    <div class="root">
+      <header class="welcome-section">
+        <h1 class="welcome-title">Calibration</h1>
+        <p class="welcome-subtitle">Monitor sensor data and adjust thresholds for audio and light devices.</p>
+      </header>
+
+      <section class="card calibration-card">
+        <h2 class="section-label">Live sensor data</h2>
+        <p id="sensor-status" class="sensor-status" style="font-size: 14px; margin-bottom: 12px; color: var(--color-primary);" aria-live="polite"></p>
+        <div id="sensor-data">
+          <div class="sensor-row">
+            <span class="sensor-label">Microphone (sound)</span>
+            <span class="sensor-value" id="sensor-mic">—</span>
+          </div>
+          <div class="sensor-row">
+            <span class="sensor-label">Ambient (sound)</span>
+            <span class="sensor-value" id="sensor-ambient">—</span>
+          </div>
+          <div class="sensor-row">
+            <span class="sensor-label">Lux (light)</span>
+            <span class="sensor-value" id="sensor-lux">—</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card calibration-card">
+        <h2 class="section-label">Audio thresholds</h2>
+        <p class="welcome-subtitle" style="font-size: 14px; margin-bottom: 12px;">quiet &lt; micQuiet, normal between, loud &gt; micLoud. dStep for transitions.</p>
+        <div class="threshold-section">
+          <div class="threshold-row">
+            <label for="audio-micQuiet">micQuiet</label>
+            <input type="number" id="audio-micQuiet" min="0" max="2000" value="400" step="10">
+          </div>
+          <div class="threshold-row">
+            <label for="audio-micLoud">micLoud</label>
+            <input type="number" id="audio-micLoud" min="0" max="2000" value="600" step="10">
+          </div>
+          <div class="threshold-row">
+            <label for="audio-dStep">dStep</label>
+            <input type="number" id="audio-dStep" min="1" max="200" value="20" step="5">
+          </div>
+        </div>
+      </section>
+
+      <section class="card calibration-card">
+        <h2 class="section-label">Light thresholds</h2>
+        <p class="welcome-subtitle" style="font-size: 14px; margin-bottom: 12px;">dark &lt; luxDark, bright &gt; luxBright. soundQuiet/soundLoud for volume lock.</p>
+        <div class="threshold-section">
+          <div class="threshold-row">
+            <label for="light-luxDark">luxDark</label>
+            <input type="number" id="light-luxDark" min="0" max="500" value="40" step="5">
+          </div>
+          <div class="threshold-row">
+            <label for="light-luxBright">luxBright</label>
+            <input type="number" id="light-luxBright" min="0" max="2000" value="200" step="10">
+          </div>
+          <div class="threshold-row">
+            <label for="light-soundQuiet">soundQuiet</label>
+            <input type="number" id="light-soundQuiet" min="0" max="2000" value="300" step="10">
+          </div>
+          <div class="threshold-row">
+            <label for="light-soundLoud">soundLoud</label>
+            <input type="number" id="light-soundLoud" min="0" max="3000" value="1000" step="50">
+          </div>
+        </div>
+      </section>
+
+      <div class="save-section">
+        <button type="button" class="save-btn" id="save-thresholds">Save thresholds</button>
+        <p class="save-error" id="save-error" role="alert" hidden></p>
+      </div>
+
+      <div class="info-links calibration-nav">
+        <a href="questions.html">Questions about the device?</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="calibration.js"></script>
+</body>
+</html>

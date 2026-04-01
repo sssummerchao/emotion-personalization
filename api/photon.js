@@ -1,25 +1,27 @@
 /**
  * Vercel serverless function: forwards web state to Particle device
- * Requires env: PARTICLE_ACCESS_TOKEN, PARTICLE_DEVICE_ID
+ * Requires env: PARTICLE_ACCESS_TOKEN, PARTICLE_DEVICE_ID (and _SETUP1–3 per family)
  */
-function getDeviceId(setup) {
-  const s = parseInt(setup, 10) || 0;
-  return s === 1 ? process.env.PARTICLE_DEVICE_ID_SETUP1 : process.env.PARTICLE_DEVICE_ID;
-}
+import { getMasterDeviceId } from './deviceEnv.js';
 
 export default async function handler(req, res) {
   const token = process.env.PARTICLE_ACCESS_TOKEN;
 
   // Diagnostic: GET /api/photon shows if env vars are loaded (for debugging)
   if (req.method === 'GET') {
-    const deviceId0 = process.env.PARTICLE_DEVICE_ID;
-    const deviceId1 = process.env.PARTICLE_DEVICE_ID_SETUP1;
+    const d0 = getMasterDeviceId(0);
+    const d1 = getMasterDeviceId(1);
+    const d2 = getMasterDeviceId(2);
+    const d3 = getMasterDeviceId(3);
+    const anyMaster = !!(d0 || d1 || d2 || d3);
     return res.status(200).json({
-      configured: !!token && (!!deviceId0 || !!deviceId1),
+      configured: !!token && anyMaster,
       hasToken: !!token,
-      setup0: { hasDeviceId: !!deviceId0 },
-      setup1: { hasDeviceId: !!deviceId1 },
-      hint: !token ? 'Set PARTICLE_ACCESS_TOKEN' : (!deviceId0 && !deviceId1) ? 'Set PARTICLE_DEVICE_ID and/or PARTICLE_DEVICE_ID_SETUP1' : undefined,
+      setup0: { hasDeviceId: !!d0 },
+      setup1: { hasDeviceId: !!d1 },
+      setup2: { hasDeviceId: !!d2 },
+      setup3: { hasDeviceId: !!d3 },
+      hint: !token ? 'Set PARTICLE_ACCESS_TOKEN' : !anyMaster ? 'Set PARTICLE_DEVICE_ID and/or PARTICLE_DEVICE_ID_SETUP1/2/3' : undefined,
     });
   }
 
@@ -36,11 +38,11 @@ export default async function handler(req, res) {
     }
   }
   const { action, emotion, hue, selectedTrack, personalizing, previewDurationSec, setup } = body || {};
-  const deviceId = getDeviceId(setup);
+  const deviceId = getMasterDeviceId(setup);
 
   if (!token || !deviceId) {
     return res.status(500).json({
-      error: 'Server not configured. Set PARTICLE_ACCESS_TOKEN and PARTICLE_DEVICE_ID (Family A) or PARTICLE_DEVICE_ID_SETUP1 (Family B) in Vercel environment variables.',
+      error: 'Server not configured. Set PARTICLE_ACCESS_TOKEN and the master PARTICLE_DEVICE_ID for this family (or _SETUP1 / _SETUP2 / _SETUP3) in Vercel environment variables.',
     });
   }
 
@@ -84,7 +86,7 @@ export default async function handler(req, res) {
     m: 50,
     p: !!personalizing,
   };
-  if (personalizing && previewDurationSec) argObj.d = previewDurationSec;  // 1 min preview for admin
+  if (personalizing && previewDurationSec) argObj.d = previewDurationSec;  // 20s preview for admin
   const arg = JSON.stringify(argObj);
 
   try {
