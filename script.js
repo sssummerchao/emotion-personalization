@@ -14,6 +14,7 @@ function getSetupId() {
   const q = params.get('setup');
   if (q !== null) return parseInt(q, 10) || 0;
   const path = window.location.pathname;
+  if (path.includes('family-a')) return 0;
   if (path.includes('family-b')) return 1;
   if (path.includes('family-c')) return 2;
   if (path.includes('family-d')) return 3;
@@ -45,8 +46,12 @@ const TRACKS = {
   '0021': 'Underwater',
 };
 
-const POLL_INTERVAL_MS = 10000;
+// Device status: each poll hits Particle (up to 3 ping calls per family). Kept conservative;
+// polling pauses while the tab is hidden. Raise interval if you need fewer API operations.
+const POLL_INTERVAL_MS = 15000;
 const INIT_FETCH_TIMEOUT_MS = 8000;  // hide loading screen after this even if API hangs
+
+let devicePollIntervalId = null;
 
 function loadFromStorage() {
   try {
@@ -253,10 +258,33 @@ async function initDeviceStatus() {
     syncToPhoton('positive', false);
   }
   hideLoadingScreen();
-  setInterval(async () => {
+
+  const pollDeviceStatusOnce = async () => {
     await fetchDeviceStatus();
     applyDeviceStatus();
-  }, POLL_INTERVAL_MS);
+  };
+
+  const startDevicePolling = () => {
+    if (devicePollIntervalId !== null) return;
+    devicePollIntervalId = setInterval(pollDeviceStatusOnce, POLL_INTERVAL_MS);
+  };
+
+  const stopDevicePolling = () => {
+    if (devicePollIntervalId !== null) {
+      clearInterval(devicePollIntervalId);
+      devicePollIntervalId = null;
+    }
+  };
+
+  if (!document.hidden) startDevicePolling();
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopDevicePolling();
+    } else {
+      pollDeviceStatusOnce();
+      startDevicePolling();
+    }
+  });
 }
 
 function hslToRgb(h, s, l) {

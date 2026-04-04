@@ -12,7 +12,16 @@
 <body class="questions-page">
   <div class="app">
     <div class="root questions-page">
-      <a href="index.html" class="back-link">← Back to personalization</a>
+      <a href="family-a.html" id="questions-back-link" class="back-link">← Back to personalization</a>
+      <script>
+        (function () {
+          var allowed = { 'family-a.html': 1, 'family-b.html': 1, 'family-c.html': 1, 'family-d.html': 1, 'index.html': 1 };
+          var p = new URLSearchParams(location.search);
+          var r = p.get('return');
+          var el = document.getElementById('questions-back-link');
+          if (el && r && allowed[r]) el.setAttribute('href', r);
+        })();
+      </script>
 
       <!-- What are the devices -->
       <section class="questions-section">

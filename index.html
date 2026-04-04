@@ -4,108 +4,55 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Photon Control</title>
+  <link rel="canonical" href="family-a.html">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .index-landing {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .index-landing-inner {
+      text-align: center;
+      max-width: 420px;
+    }
+    .index-landing-inner h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      color: var(--color-primary-text);
+    }
+    .index-landing-inner p {
+      margin: 0.85rem 0;
+      line-height: 1.4;
+    }
+    .index-landing-inner a {
+      color: var(--color-primary);
+      font-weight: 500;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .index-landing-inner a:hover {
+      opacity: 0.85;
+    }
+  </style>
 </head>
-<body class="main-page" data-setup="0">
-  <div id="loading-screen" class="loading-screen" aria-live="polite" aria-busy="true">
-    <div class="loading-spinner"></div>
+<body class="index-landing">
+  <div class="index-landing-inner">
+    <h1>Photon Control</h1>
+    <p><a href="family-a.html">Family A — personalize devices</a></p>
+    <p><a href="questions.html?return=index.html">Questions about the device?</a></p>
+    <p style="font-size: 14px; opacity: 0.85; margin-top: 1.5rem;">
+      Other families:
+      <a href="family-b.html">B</a> ·
+      <a href="family-c.html">C</a> ·
+      <a href="family-d.html">D</a>
+    </p>
   </div>
-  <div class="app">
-    <!-- Master Offline: Blocked Entry (Figma 595:1750) - shown by default until API confirms master is online -->
-    <div id="screen-master-offline" class="root screen">
-      <div class="blocked-content">
-        <h1 class="blocked-title">Looks like your master device is offline.</h1>
-        <div class="blocked-illustration" aria-hidden="true">
-          <div class="blocked-ellipse"></div>
-          <img class="blocked-device-icon" src="assets/master-device.png" alt="">
-        </div>
-        <p class="blocked-message">To personalize your devices, please ensure your master device is powered on and connected to Wi-Fi.</p>
-      </div>
-    </div>
-
-    <!-- Personalization Screen (592:1570, 628:2143, 631:2690, 632:2969, 632:2838) - hidden until master is online -->
-    <div id="screen-personalize" class="root screen" hidden style="display: none;">
-      <header class="welcome-section">
-        <h1 class="welcome-title">Welcome!</h1>
-        <p class="welcome-subtitle">Let's personalize your devices to respond to different emotional states.</p>
-      </header>
-
-      <!-- Unified card: Emotion + Light + Sound + Save (Figma 628:2143) -->
-      <section class="card personalize-card">
-        <div class="personalize-inner">
-          <!-- Emotion Toggle (inside card) -->
-          <div class="emotion-toggle">
-            <button type="button" class="emotion-btn active" data-emotion="positive" aria-pressed="true">
-              <img class="emotion-icon emotion-icon-positive" src="assets/positive-white.png" alt="" width="14" height="16">
-              <span>Positive</span>
-            </button>
-            <button type="button" class="emotion-btn" data-emotion="negative" aria-pressed="false">
-              <img class="emotion-icon emotion-icon-negative" src="assets/negative-blue.png" alt="" width="10" height="16">
-              <span>Negative</span>
-            </button>
-          </div>
-          <!-- Light (or offline banner) -->
-          <div class="personalize-subsection light-subsection" id="light-section">
-            <div id="light-online-content">
-              <h2 class="section-label" id="light-section-label">Light color</h2>
-              <div class="hue-picker-container" id="light-controls">
-                <input type="range" id="hue-slider" class="hue-slider" min="0" max="360" value="30" aria-label="Select hue color">
-              </div>
-            </div>
-            <div class="offline-banner" id="light-offline-banner" hidden>
-              <div class="offline-banner-text">
-                <p>Your light device is offline.</p>
-                <p>Plug it in to see the emotion.</p>
-              </div>
-              <img class="offline-icon light-icon" src="assets/light-device.png" alt="" width="90" height="60" aria-hidden="true">
-            </div>
-          </div>
-
-          <!-- Sound (or offline banner) -->
-          <div class="personalize-subsection sound-subsection" id="sound-section">
-            <div id="sound-online-content">
-              <h2 class="section-label" id="sound-section-label">Sound</h2>
-              <div class="track-list" id="sound-controls">
-                <button type="button" class="track-chip" data-track="0001">Bird</button>
-                <button type="button" class="track-chip" data-track="0005">Bubble</button>
-                <button type="button" class="track-chip" data-track="0007">Fire</button>
-                <button type="button" class="track-chip" data-track="0009">Hitting</button>
-                <button type="button" class="track-chip" data-track="0013">River</button>
-                <button type="button" class="track-chip" data-track="0015">Drilling</button>
-                <button type="button" class="track-chip" data-track="0017">Cricket</button>
-                <button type="button" class="track-chip" data-track="0019">Rain</button>
-                <button type="button" class="track-chip" data-track="0021">Underwater</button>
-              </div>
-            </div>
-            <div class="offline-banner" id="sound-offline-banner" hidden>
-              <div class="offline-banner-text">
-                <p>Your sound device is offline.</p>
-                <p>Plug it in to hear the emotion.</p>
-              </div>
-              <img class="offline-icon sound-icon" src="assets/sound-device.png" alt="" width="104" height="53" aria-hidden="true">
-            </div>
-          </div>
-
-          <!-- Save Button (inside card) -->
-          <div class="save-section">
-            <button type="button" class="save-btn" id="save-to-device">
-              Save emotion
-            </button>
-            <p class="save-error" id="save-error" role="alert" hidden></p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Info Link -->
-      <div class="info-links">
-        <a href="questions.html" class="info-link">Questions about the device?</a>
-      </div>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
 </body>
 </html>

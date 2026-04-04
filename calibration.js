@@ -1,7 +1,7 @@
 /**
  * Photon Calibration Page
  * Real-time mic and lux sensor display; edit thresholds for audio and light devices.
- * Polls every 30s to limit Particle data operations (4 variable fetches per poll).
+ * Polls on an interval to limit Particle data operations (4 variable GETs per poll).
  * Stops polling when page is closed or hidden.
  */
 const POLL_INTERVAL_MS = 10000;   // 10s
@@ -16,6 +16,7 @@ function getSetupId() {
   const q = params.get('setup');
   if (q !== null) return parseInt(q, 10) || 0;
   const path = window.location.pathname;
+  if (path.includes('family-a')) return 0;
   if (path.includes('family-b')) return 1;
   if (path.includes('family-c')) return 2;
   if (path.includes('family-d')) return 3;
@@ -32,6 +33,13 @@ function particleSoundEnvName(setup) {
   const s = parseInt(setup, 10) || 0;
   if (s === 0) return 'PARTICLE_SOUND_DEVICE_ID';
   return `PARTICLE_SOUND_DEVICE_ID_SETUP${s}`;
+}
+
+/** Main personalization URL for setup index (matches family-a … family-d pages). */
+function personalizationPageForSetup(setup) {
+  const pages = ['family-a.html', 'family-b.html', 'family-c.html', 'family-d.html'];
+  const s = parseInt(setup, 10) || 0;
+  return pages[s] || 'family-a.html';
 }
 
 function fmt(num) {
@@ -140,7 +148,7 @@ function poll() {
         const missing = [];
         if (!debug.lightId) missing.push(particleLightEnvName(setup));
         if (!debug.soundId) missing.push(particleSoundEnvName(setup));
-        setStatus(`Missing env: ${missing.join(', ')}. Add to .env.local (vercel dev) or Vercel. Use ?setup=N (0–3) or family-b/c/d.html.`, true);
+        setStatus(`Missing env: ${missing.join(', ')}. Add to .env.local (vercel dev) or Vercel. Use ?setup=N (0–3) or family-a/b/c/d.html.`, true);
       } else if (data.sound || data.light) {
         const hasData = [data.sound?.mic, data.sound?.ambient, data.light?.lux].some(v => v != null);
         const errs = data._debug?.particleErrors;
@@ -201,4 +209,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const saveBtn = document.getElementById('save-thresholds');
   if (saveBtn) saveBtn.addEventListener('click', saveThresholds);
+
+  const questionsLink = document.querySelector('.info-links a[href*="questions"]');
+  if (questionsLink) {
+    questionsLink.href = 'questions.html?return=' + personalizationPageForSetup(getSetupId());
+  }
 });

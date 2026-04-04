@@ -9,6 +9,13 @@ A web dashboard for controlling emotion state, light colors, sound tracks, and m
 - **Music Player**: 8 sound tracks with play/pause
 - **Motor Speed**: Slider from Fast to Slow
 
+### Particle cloud usage (kept low)
+
+- **Personalization pages** poll device online status about every **15s** while the tab is **visible**; polling **stops** when you switch away or minimize the tab (no background drain).
+- Each poll triggers up to **three** Particle device **pings** (master / light / sound) when IDs differ.
+- **Calibration** polls sensor variables on the same **10s** interval and also pauses when the tab is hidden.
+- **setState** / **Save** only run when you change settings or save — not on a timer.
+
 ## Connect to Particle/Photon
 
 The web app syncs color, music, and motor settings to your Particle device. Set these in Vercel:
@@ -30,11 +37,13 @@ The firmware can be built as three separate roles so one **Master** device (touc
 
 ### Separate URLs per family (A–D)
 
-- **index.html** (or `/`) = Family A — setup `0`
+- **`/`** or **index.html** → short landing: link to **family-a.html**, **questions.html** (and B/C/D)
+- **family-a.html** = Family A — setup `0`
 - **family-b.html** = Family B — setup `1`
 - **family-c.html** = Family C — setup `2`
 - **family-d.html** = Family D — setup `3`
 - **calibration.html** = Sensor calibration — use `?setup=0`–`3` to match the family (default `0`)
+- **questions.html** uses `?return=family-*.html` so “Back to personalization” returns to the same family page.
 
 **Vercel environment variables:**
 
@@ -55,7 +64,7 @@ The firmware can be built as three separate roles so one **Master** device (touc
 | `PARTICLE_SOUND_DEVICE_ID_SETUP3` | D | Audio device ID |
 
 - Build and flash each role — see `../FLASHING.md` in the project root. Use `./build-all.sh` for all setups.
-- Master publishes `photon/state/SETUP_ID` (private); Light and Audio subscribe and drive outputs from that state.
+- Master publishes private state on `photon/state/0` (Pair 0 / A–B) or `photon/state/1` (Pair 1 / C–D); Light and Audio subscribe and drive outputs from that state.
 
 ## Troubleshooting
 
