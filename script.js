@@ -364,6 +364,18 @@ function updateSoundStepUI(stepIndex) {
   document.querySelectorAll('.sound-step').forEach((el, i) => {
     el.classList.toggle('is-active', i === stepIndex);
   });
+  updateSoundCardBackground(stepIndex);
+}
+
+/** Card area dot density follows slider: calm = sparse small dots, intense = dense larger dots */
+function updateSoundCardBackground(stepIndex) {
+  const section = document.getElementById('sound-section');
+  if (!section) return;
+  const t = Math.max(0, Math.min(1, stepIndex / 8));
+  const cell = 28 - t * 19;
+  const dot = 0.9 + t * 2.4;
+  section.style.setProperty('--sound-card-cell', `${cell}px`);
+  section.style.setProperty('--sound-card-dot', `${dot}px`);
 }
 
 function updateEmotionPickerUI() {
