@@ -153,25 +153,31 @@ body.questions-page {
 
 .emotion-line--pick {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: flex-start;
-  gap: 8px 10px;
+  justify-content: space-between;
+  gap: 8px 16px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   font-size: inherit;
   font-weight: 300;
   line-height: 42px;
 }
 
 .emotion-lead {
+  flex: 0 1 auto;
   color: var(--dark-blue, #3967bd);
   font-weight: 300;
 }
 
 .emotion-stack {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: flex-end;
+  flex: 0 0 auto;
   gap: 0;
-  vertical-align: top;
+  text-align: right;
 }
 
 .emotion-pick {
@@ -186,18 +192,20 @@ body.questions-page {
   line-height: 42px;
   letter-spacing: -0.6px;
   cursor: pointer;
-  text-align: left;
+  text-align: right;
   color: var(--dark-blue, #3967bd);
   transition: opacity 0.15s ease;
 }
 
 .emotion-pick.is-selected {
+  order: 0;
   font-weight: 600;
   color: var(--dark-blue, #3967bd);
   opacity: 1;
 }
 
 .emotion-pick:not(.is-selected) {
+  order: 1;
   font-weight: 300;
   opacity: 0.42;
 }
@@ -213,6 +221,17 @@ body.questions-page {
   line-height: 42px;
   letter-spacing: -0.6px;
   color: var(--dark-blue, #3967bd);
+}
+
+@media (max-width: 400px) {
+  .emotion-line--pick {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .emotion-stack {
+    margin-left: auto;
+  }
 }
 
 /* ============================================
@@ -568,15 +587,6 @@ body.questions-page {
   color: var(--color-primary);
   opacity: 0.88;
   padding: 6px 4px 0;
-}
-
-.sound-current-name {
-  text-align: center;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.3px;
-  color: var(--color-primary);
-  margin: 6px 0 0;
 }
 
 /* ============================================
