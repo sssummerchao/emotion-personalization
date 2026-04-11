@@ -183,6 +183,54 @@ body.questions-page {
   width: 10px;
 }
 
+/* Figma 1023:2556 — "When I'm feeling positive / negative" */
+.emotion-toggle--feeling {
+  min-height: auto;
+  height: auto;
+}
+
+.emotion-toggle--feeling .emotion-btn {
+  flex-direction: column;
+  gap: 6px;
+  height: auto;
+  min-height: 64px;
+  padding: 12px 8px;
+  justify-content: center;
+  text-align: center;
+}
+
+.emotion-label-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  line-height: 1.2;
+  max-width: 100%;
+}
+
+.emotion-when {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+  opacity: 0.92;
+}
+
+.emotion-accent {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.28px;
+  color: var(--color-primary);
+}
+
+.emotion-btn.active .emotion-when,
+.emotion-btn.active .emotion-accent {
+  color: var(--color-white);
+}
+
+.emotion-btn.active .emotion-accent {
+  font-weight: 700;
+}
+
 
 /* ============================================
    Cards - Unified Personalization (Figma 628:2143)
@@ -348,8 +396,188 @@ body.questions-page {
   cursor: grab;
 }
 
+/* Light slider — Figma sticker handle (1023:2556) */
+.hue-slider--sticker-thumb {
+  height: 52px;
+}
+
+.hue-slider--sticker-thumb::-webkit-slider-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: url('assets/light-slider-sticker.png') center / contain no-repeat;
+  border: none;
+  box-shadow: 0 2px 10px rgba(57, 103, 189, 0.25);
+}
+
+.hue-slider--sticker-thumb::-webkit-slider-thumb:hover {
+  transform: scale(1.05);
+}
+
+.hue-slider--sticker-thumb::-moz-range-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: url('assets/light-slider-sticker.png') center / contain no-repeat;
+  border: none;
+  box-shadow: 0 2px 10px rgba(57, 103, 189, 0.25);
+}
+
 /* ============================================
-   Sound Section - Chip Style
+   Sound — 9-step slider + screentone (Figma 1023:2556)
+   ============================================ */
+
+.sound-slider-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.sound-axis-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.24px;
+  color: var(--color-primary);
+  opacity: 0.85;
+  padding: 0 2px;
+}
+
+.sound-slider-lane {
+  position: relative;
+  width: 100%;
+  padding: 6px 0 10px;
+}
+
+.sound-screentone-strip {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 3px;
+  height: 40px;
+  align-items: stretch;
+  margin-bottom: -26px;
+  pointer-events: none;
+}
+
+.sound-step {
+  border-radius: 4px;
+  min-height: 36px;
+  background-color: rgba(57, 103, 189, 0.06);
+  background-image: radial-gradient(circle, rgba(57, 103, 189, 0.45) 1px, transparent 1px);
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.sound-step:nth-child(1) {
+  background-size: 9px 9px;
+  opacity: 0.65;
+}
+
+.sound-step:nth-child(2) {
+  background-size: 8px 8px;
+  opacity: 0.68;
+}
+
+.sound-step:nth-child(3) {
+  background-size: 7px 7px;
+  opacity: 0.72;
+}
+
+.sound-step:nth-child(4) {
+  background-size: 6px 6px;
+  opacity: 0.76;
+}
+
+.sound-step:nth-child(5) {
+  background-size: 5px 5px;
+  opacity: 0.8;
+}
+
+.sound-step:nth-child(6) {
+  background-size: 5px 5px;
+  opacity: 0.84;
+}
+
+.sound-step:nth-child(7) {
+  background-size: 4px 4px;
+  opacity: 0.88;
+}
+
+.sound-step:nth-child(8) {
+  background-size: 4px 4px;
+  opacity: 0.92;
+}
+
+.sound-step:nth-child(9) {
+  background-size: 3px 3px;
+  opacity: 0.95;
+}
+
+.sound-step.is-active {
+  background-color: rgba(57, 103, 189, 0.22);
+  box-shadow: inset 0 0 0 2px var(--color-primary);
+  opacity: 1;
+}
+
+.sound-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 52px;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  margin: 0;
+}
+
+.sound-slider::-webkit-slider-runnable-track {
+  height: 40px;
+  background: transparent;
+  border-radius: 4px;
+}
+
+.sound-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 56px;
+  height: 56px;
+  margin-top: -8px;
+  border-radius: 14px;
+  background: url('assets/sound-slider-sticker.png') center / contain no-repeat;
+  border: none;
+  filter: drop-shadow(0 2px 8px rgba(57, 103, 189, 0.35));
+  cursor: grab;
+}
+
+.sound-slider::-moz-range-track {
+  height: 40px;
+  background: transparent;
+}
+
+.sound-slider::-moz-range-thumb {
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: 14px;
+  background: url('assets/sound-slider-sticker.png') center / contain no-repeat;
+  filter: drop-shadow(0 2px 8px rgba(57, 103, 189, 0.35));
+  cursor: grab;
+}
+
+.sound-current-name {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: var(--color-primary);
+  margin: 4px 0 0;
+}
+
+/* ============================================
+   Sound Section - Chip Style (legacy; chips removed from HTML)
    ============================================ */
 
 .track-list {

@@ -33,18 +33,31 @@ const state = {
   devices: { master: false, light: true, sound: true },  // assume master offline until API responds (avoids blink)
 };
 
-// Track metadata for audio files
-const TRACKS = {
-  '0001': 'Bird',
-  '0005': 'Bubble',
-  '0007': 'Fire',
-  '0009': 'Hitting',
-  '0013': 'River',
-  '0015': 'Drilling',
-  '0017': 'Cricket',
-  '0019': 'Rain',
-  '0021': 'Underwater',
-};
+// Track metadata (DFPlayer file IDs → label). Calm → intense order for sound slider:
+const SOUND_STEPS = [
+  { id: '0021', label: 'Underwater' },
+  { id: '0007', label: 'Fire' },
+  { id: '0017', label: 'Cricket' },
+  { id: '0019', label: 'Rain' },
+  { id: '0013', label: 'River' },
+  { id: '0005', label: 'Bubble' },
+  { id: '0001', label: 'Bird' },
+  { id: '0009', label: 'Hitting' },
+  { id: '0015', label: 'Drilling' },
+];
+
+const TRACKS = Object.fromEntries(SOUND_STEPS.map((s) => [s.id, s.label]));
+
+function trackIdToStepIndex(trackId) {
+  if (!trackId) return 0;
+  const i = SOUND_STEPS.findIndex((s) => s.id === trackId);
+  return i >= 0 ? i : 0;
+}
+
+function stepIndexToTrackId(index) {
+  const clamped = Math.max(0, Math.min(SOUND_STEPS.length - 1, index | 0));
+  return SOUND_STEPS[clamped].id;
+}
 
 // Device status: each poll hits Particle (up to 3 ping calls per family). Kept conservative;
 // polling pauses while the tab is hidden. Raise interval if you need fewer API operations.
@@ -229,7 +242,7 @@ function init() {
   loadFromStorage();
   initEmotionToggle();
   initColorSwitcher();
-  initMusicPlayer();
+  initSoundSlider();
   initSaveButton();
   applyStateToUI();
   applyDeviceStatus();  // Show master-offline by default (avoids blink when master is offline)
@@ -318,10 +331,24 @@ function applyStateToUI() {
     hueSlider.value = s.hue;
     updateHuePreview(s.hue);
   }
-  document.querySelectorAll('.track-chip').forEach((el) => {
-    el.classList.toggle('selected', el.dataset.track === s.selectedTrack);
-  });
+  const soundSlider = document.getElementById('sound-slider');
+  if (soundSlider) {
+    const idx = trackIdToStepIndex(s.selectedTrack);
+    soundSlider.value = String(idx);
+    updateSoundStepUI(idx);
+  }
   updateEmotionIcons();
+}
+
+function updateSoundStepUI(stepIndex) {
+  const nameEl = document.getElementById('sound-current-name');
+  const soundSlider = document.getElementById('sound-slider');
+  const step = SOUND_STEPS[stepIndex];
+  if (nameEl && step) nameEl.textContent = step.label;
+  if (soundSlider && step) soundSlider.setAttribute('aria-valuetext', step.label);
+  document.querySelectorAll('.sound-step').forEach((el, i) => {
+    el.classList.toggle('is-active', i === stepIndex);
+  });
 }
 
 function updateEmotionIcons() {
@@ -365,21 +392,18 @@ function initColorSwitcher() {
   });
 }
 
-function initMusicPlayer() {
-  document.querySelectorAll('.track-chip').forEach((trackEl) => {
-    const trackId = trackEl.dataset.track;
-    trackEl.addEventListener('click', () => selectTrack(trackId, trackEl));
-  });
-}
+function initSoundSlider() {
+  const soundSlider = document.getElementById('sound-slider');
+  if (!soundSlider) return;
 
-function selectTrack(trackId, trackEl) {
-  if (!state.devices.master) return;
-  const s = getCurrentState();
-  const isDeselecting = s.selectedTrack === trackId;
-  const newSelection = isDeselecting ? null : trackId;
-  setCurrentState({ selectedTrack: newSelection });
-  document.querySelectorAll('.track-chip').forEach((t) => {
-    t.classList.toggle('selected', t.dataset.track === newSelection);
+  soundSlider.addEventListener('input', () => {
+    const idx = parseInt(soundSlider.value, 10);
+    updateSoundStepUI(idx);
+  });
+  soundSlider.addEventListener('change', () => {
+    const idx = parseInt(soundSlider.value, 10);
+    const trackId = stepIndexToTrackId(idx);
+    setCurrentState({ selectedTrack: trackId });
   });
 }
 
