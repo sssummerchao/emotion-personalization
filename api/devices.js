@@ -42,8 +42,8 @@ export default async function handler(req, res) {
     });
   }
 
-  // Fetch each device from Particle; null = unknown → default true (allow use)
-  let masterOnline = true;
+  // Without token or master device ID, treat as offline (otherwise UI shows "online" but /api/photon cannot preview — common for Families C/D if SETUP2/SETUP3 env vars are missing).
+  let masterOnline = false;
   let lightOnline = true;
   let soundOnline = true;
 
@@ -54,7 +54,13 @@ export default async function handler(req, res) {
     soundPingId ? pingDevice(token, soundPingId) : { online: null },
   ]);
 
-  if (masterResult.online !== null) masterOnline = masterResult.online;
+  if (token && masterId) {
+    if (masterResult.online !== null) {
+      masterOnline = masterResult.online;
+    } else {
+      masterOnline = true; // ping inconclusive — allow personalization UI
+    }
+  }
   if (lightId === masterId) {
     lightOnline = masterOnline;
   } else if (lightResult.online === true) {

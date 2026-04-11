@@ -364,6 +364,31 @@ body.questions-page {
   --hue-pct: 8.33%;
   width: 100%;
   padding: 4px 0 8px;
+  isolation: isolate;
+}
+
+/* Gradient bar behind plumb + thumb (input paints on top with transparent track) */
+.hue-slider-wrap::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 14px;
+  height: 48px;
+  border-radius: 22px;
+  z-index: 0;
+  pointer-events: none;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+  background: linear-gradient(
+    to right,
+    hsl(0, 85%, 62%),
+    hsl(30, 85%, 62%),
+    hsl(60, 80%, 58%),
+    hsl(120, 70%, 52%),
+    hsl(200, 75%, 55%),
+    hsl(280, 70%, 62%),
+    hsl(330, 85%, 68%)
+  );
 }
 
 .hue-slider-plumb {
@@ -397,40 +422,32 @@ body.questions-page {
   width: 100%;
   height: 48px;
   border-radius: 22px;
-  background: linear-gradient(
-    to right,
-    hsl(0, 85%, 62%),
-    hsl(30, 85%, 62%),
-    hsl(60, 80%, 58%),
-    hsl(120, 70%, 52%),
-    hsl(200, 75%, 55%),
-    hsl(280, 70%, 62%),
-    hsl(330, 85%, 68%)
-  );
+  background: transparent;
   outline: none;
   cursor: pointer;
   position: relative;
   z-index: 2;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .hue-slider::-webkit-slider-runnable-track {
   height: 48px;
   border-radius: 22px;
+  background: transparent;
 }
 
 .hue-slider::-moz-range-track {
   height: 48px;
   border-radius: 22px;
+  background: transparent;
 }
 
 .hue-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 64px;
-  min-width: 64px;
-  height: 64px;
-  margin-top: -8px;
+  width: 70px;
+  min-width: 70px;
+  height: 70px;
+  margin-top: -11px;
   border-radius: 16px;
   background: url('assets/light-slider-sticker.png') center / contain no-repeat;
   border: none;
@@ -443,9 +460,9 @@ body.questions-page {
 }
 
 .hue-slider::-moz-range-thumb {
-  width: 64px;
-  min-width: 64px;
-  height: 64px;
+  width: 70px;
+  min-width: 70px;
+  height: 70px;
   border-radius: 16px;
   background: url('assets/light-slider-sticker.png') center / contain no-repeat;
   border: none;
@@ -469,6 +486,7 @@ body.questions-page {
   position: relative;
   width: 100%;
   padding: 8px 0 4px;
+  isolation: isolate;
 }
 
 .sound-track-unified {
@@ -476,12 +494,13 @@ body.questions-page {
   height: 48px;
   border-radius: 16px;
   overflow: hidden;
-  margin-bottom: -36px;
+  margin-bottom: -39px;
   z-index: 0;
   background: var(--dark-blue, #3967bd);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.15),
     inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+  pointer-events: none;
 }
 
 .sound-screentone-strip {
@@ -515,29 +534,30 @@ body.questions-page {
   background-color: rgba(255, 255, 255, 0.07);
 }
 
+/* Plumb is a sibling of the track (see HTML) so it stacks above the blue bar but below the thumb */
 .sound-slider-plumb {
   position: absolute;
   left: var(--sound-pct);
-  top: 0;
-  bottom: 0;
+  top: 8px;
   width: 2px;
+  height: 48px;
   transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 0 0 1px rgba(57, 103, 189, 0.12);
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
 }
 
 .sound-slider {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 64px;
+  height: 70px;
   background: transparent;
   outline: none;
   cursor: pointer;
   position: relative;
-  z-index: 2;
+  z-index: 3;
   margin: 0;
 }
 
@@ -550,10 +570,10 @@ body.questions-page {
 .sound-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 64px;
-  min-width: 64px;
-  height: 64px;
-  margin-top: -8px;
+  width: 70px;
+  min-width: 70px;
+  height: 70px;
+  margin-top: -11px;
   border-radius: 16px;
   background: url('assets/sound-slider-sticker.png') center / contain no-repeat;
   border: none;
@@ -568,9 +588,9 @@ body.questions-page {
 }
 
 .sound-slider::-moz-range-thumb {
-  width: 64px;
-  min-width: 64px;
-  height: 64px;
+  width: 70px;
+  min-width: 70px;
+  height: 70px;
   border: none;
   border-radius: 16px;
   background: url('assets/sound-slider-sticker.png') center / contain no-repeat;

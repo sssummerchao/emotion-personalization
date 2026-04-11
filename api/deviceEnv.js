@@ -1,5 +1,7 @@
 /**
  * Map setup index (0–3) to Particle device ID env vars — Families A–D.
+ * Web setup index is not the same as firmware PHOTON_SETUP_ID: Families C & D use
+ * PARTICLE_*_SETUP2 and PARTICLE_*_SETUP3 here (Pair 1 devices still use photon/state/1 in firmware).
  */
 const MASTER_KEYS = [
   'PARTICLE_DEVICE_ID',
@@ -26,13 +28,29 @@ function clampSetup(setup) {
 }
 
 export function getMasterDeviceId(setup) {
-  return process.env[MASTER_KEYS[clampSetup(setup)]];
+  const s = clampSetup(setup);
+  const id = process.env[MASTER_KEYS[s]];
+  if (id) return id;
+  // Optional aliases if SETUP2/SETUP3 were not added in Vercel
+  if (s === 2) return process.env.PARTICLE_DEVICE_ID_FAMILY_C;
+  if (s === 3) return process.env.PARTICLE_DEVICE_ID_FAMILY_D;
+  return undefined;
 }
 
 export function getLightDeviceId(setup) {
-  return process.env[LIGHT_KEYS[clampSetup(setup)]];
+  const s = clampSetup(setup);
+  const id = process.env[LIGHT_KEYS[s]];
+  if (id) return id;
+  if (s === 2) return process.env.PARTICLE_LIGHT_DEVICE_ID_FAMILY_C;
+  if (s === 3) return process.env.PARTICLE_LIGHT_DEVICE_ID_FAMILY_D;
+  return undefined;
 }
 
 export function getSoundDeviceId(setup) {
-  return process.env[SOUND_KEYS[clampSetup(setup)]];
+  const s = clampSetup(setup);
+  const id = process.env[SOUND_KEYS[s]];
+  if (id) return id;
+  if (s === 2) return process.env.PARTICLE_SOUND_DEVICE_ID_FAMILY_C;
+  if (s === 3) return process.env.PARTICLE_SOUND_DEVICE_ID_FAMILY_D;
+  return undefined;
 }
