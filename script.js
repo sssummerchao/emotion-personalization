@@ -330,6 +330,7 @@ function applyStateToUI() {
   if (hueSlider) {
     hueSlider.value = s.hue;
     updateHuePreview(s.hue);
+    updateHuePlumb(s.hue);
   }
   const soundSlider = document.getElementById('sound-slider');
   if (soundSlider) {
@@ -337,42 +338,55 @@ function applyStateToUI() {
     soundSlider.value = String(idx);
     updateSoundStepUI(idx);
   }
-  updateEmotionIcons();
+  updateEmotionPickerUI();
+}
+
+function updateHuePlumb(hue) {
+  const wrap = document.getElementById('hue-slider-wrap');
+  const h = typeof hue === 'number' ? hue : parseInt(document.getElementById('hue-slider')?.value || '0', 10);
+  if (wrap && !Number.isNaN(h)) {
+    const pct = Math.max(0, Math.min(100, (h / 360) * 100));
+    wrap.style.setProperty('--hue-pct', `${pct}%`);
+  }
 }
 
 function updateSoundStepUI(stepIndex) {
   const nameEl = document.getElementById('sound-current-name');
   const soundSlider = document.getElementById('sound-slider');
+  const lane = document.getElementById('sound-slider-lane');
   const step = SOUND_STEPS[stepIndex];
   if (nameEl && step) nameEl.textContent = step.label;
   if (soundSlider && step) soundSlider.setAttribute('aria-valuetext', step.label);
+  if (lane) {
+    const pct = (stepIndex / 8) * 100;
+    lane.style.setProperty('--sound-pct', `${pct}%`);
+  }
   document.querySelectorAll('.sound-step').forEach((el, i) => {
     el.classList.toggle('is-active', i === stepIndex);
   });
 }
 
-function updateEmotionIcons() {
-  const posIcon = document.querySelector('.emotion-btn[data-emotion="positive"] .emotion-icon');
-  const negIcon = document.querySelector('.emotion-btn[data-emotion="negative"] .emotion-icon');
-  const positiveActive = state.emotion === 'positive';
-  if (posIcon) posIcon.src = positiveActive ? 'assets/positive-white.png' : 'assets/positive-blue.png';
-  if (negIcon) negIcon.src = positiveActive ? 'assets/negative-blue.png' : 'assets/negative-white.png';
+function updateEmotionPickerUI() {
+  document.querySelectorAll('.emotion-pick').forEach((btn) => {
+    const em = btn.dataset.emotion;
+    const on = state.emotion === em;
+    btn.classList.toggle('is-selected', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    if (em === 'positive') {
+      btn.textContent = on ? 'positive,' : 'positive';
+    } else {
+      btn.textContent = on ? 'negative,' : 'negative';
+    }
+  });
 }
 
 function initEmotionToggle() {
-  updateEmotionIcons();
-  const buttons = document.querySelectorAll('.emotion-btn');
+  updateEmotionPickerUI();
+  const buttons = document.querySelectorAll('.emotion-pick');
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
-      if (!state.devices.master) return;
-      buttons.forEach((b) => {
-        b.classList.remove('active');
-        b.setAttribute('aria-pressed', 'false');
-      });
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
       state.emotion = btn.dataset.emotion;
-      updateEmotionIcons();
+      updateEmotionPickerUI();
       applyStateToUI();
       syncToPhoton(state.emotion, false);
     });
@@ -385,6 +399,7 @@ function initColorSwitcher() {
   hueSlider.addEventListener('input', () => {
     const hue = parseInt(hueSlider.value, 10);
     updateHuePreview(hue);
+    updateHuePlumb(hue);
   });
   hueSlider.addEventListener('change', () => {
     const hue = parseInt(hueSlider.value, 10);

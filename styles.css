@@ -122,115 +122,82 @@ body.questions-page {
 }
 
 /* ============================================
-   Emotion Toggle (Figma 628:2198 - inside card)
+   Emotion — sentence + vertical word stack (Figma ref. images 2–3)
    ============================================ */
 
-.emotion-toggle {
-  display: flex;
-  gap: 0;
-  width: 100%;
-  height: 48px;
-  overflow: hidden;
+.emotion-sentence {
+  padding: 20px 16px 18px;
+  text-align: left;
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-primary-border);
 }
 
-.emotion-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 10px;
-  height: 48px;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  font-family: inherit;
-  font-size: 16px;
-  font-weight: 400;
+.emotion-line {
+  margin: 0;
   color: var(--color-primary);
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  letter-spacing: -0.32px;
 }
 
-.emotion-btn:first-child {
-  border-top-left-radius: var(--radius-sm);
-  border-bottom-left-radius: 0;
-}
-
-.emotion-btn:last-child {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.emotion-btn:hover:not(.active) {
-  background: rgba(57, 103, 189, 0.06);
-}
-
-.emotion-btn.active {
-  background: var(--color-primary);
-  color: var(--color-white);
-  font-weight: 500;
-}
-
-.emotion-icon {
-  flex-shrink: 0;
-  width: 14px;
-  height: 16px;
-  display: block;
-}
-
-.emotion-btn:last-child .emotion-icon {
-  width: 10px;
-}
-
-/* Figma 1023:2556 — "When I'm feeling positive / negative" */
-.emotion-toggle--feeling {
-  min-height: auto;
-  height: auto;
-}
-
-.emotion-toggle--feeling .emotion-btn {
-  flex-direction: column;
-  gap: 6px;
-  height: auto;
-  min-height: 64px;
-  padding: 12px 8px;
-  justify-content: center;
-  text-align: center;
-}
-
-.emotion-label-stack {
+.emotion-line--pick {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  line-height: 1.2;
-  max-width: 100%;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 6px 8px;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.35;
 }
 
-.emotion-when {
-  font-size: 11px;
-  font-weight: 400;
-  letter-spacing: -0.2px;
+.emotion-lead {
+  color: var(--color-primary);
   opacity: 0.92;
 }
 
-.emotion-accent {
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: -0.28px;
+.emotion-stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  vertical-align: top;
+}
+
+.emotion-pick {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  letter-spacing: -0.34px;
+  cursor: pointer;
+  text-align: left;
+  line-height: 1.15;
   color: var(--color-primary);
+  transition: color 0.15s ease, opacity 0.15s ease;
 }
 
-.emotion-btn.active .emotion-when,
-.emotion-btn.active .emotion-accent {
-  color: var(--color-white);
-}
-
-.emotion-btn.active .emotion-accent {
+.emotion-pick.is-selected {
   font-weight: 700;
+  color: #2a4d9e;
+  opacity: 1;
 }
 
+.emotion-pick:not(.is-selected) {
+  font-weight: 400;
+  opacity: 0.38;
+}
+
+.emotion-pick:not(.is-selected):hover {
+  opacity: 0.55;
+}
+
+.emotion-line--trail {
+  margin-top: 10px;
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--color-primary);
+  opacity: 0.92;
+}
 
 /* ============================================
    Cards - Unified Personalization (Figma 628:2143)
@@ -260,22 +227,27 @@ body.questions-page {
   justify-content: center;
 }
 
-/* Light subsection: white base (#fff) + 20% hue overlay — not card gray #e4e9f1 (Figma 628:2216) */
+/* Light — pale yellow panel + hue (Figma ref. image 5) */
 .light-subsection {
   --light-overlay: var(--light-bg-color, rgba(213, 113, 235, 0.2));
-  background-color: #ffffff;
-  background-image: linear-gradient(var(--light-overlay), var(--light-overlay));
-  min-height: 180px;
+  background-color: #fcf7e6;
+  background-image:
+    linear-gradient(var(--light-overlay), var(--light-overlay)),
+    radial-gradient(circle, rgba(57, 103, 189, 0.05) 1px, transparent 1px);
+  background-size: auto, 14px 14px;
+  min-height: 200px;
 }
 
 .light-subsection.light-offline {
   background: transparent !important;
 }
 
-/* Sound subsection: card bg #e4e9f1 (628:2167), same min-height as light for consistency */
+/* Sound — dot grid panel (Figma ref. image 4) */
 .sound-subsection {
-  background: transparent;
-  min-height: 180px;
+  background: #e8ecf4;
+  background-image: radial-gradient(circle, rgba(57, 103, 189, 0.07) 1px, transparent 1px);
+  background-size: 14px 14px;
+  min-height: 200px;
 }
 
 .sound-subsection.sound-offline {
@@ -335,196 +307,184 @@ body.questions-page {
 }
 
 /* ============================================
-   Hue Picker
+   Light slider — vivid → mellow + sticker + plumb (Figma ref. image 5)
    ============================================ */
 
-.hue-picker-container {
+.light-slider-panel {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.hue-slider-wrap {
+  position: relative;
+  --hue-pct: 8.33%;
+  width: 100%;
+  padding: 4px 0 8px;
+}
+
+.hue-slider-plumb {
+  position: absolute;
+  left: var(--hue-pct);
+  top: 18px;
+  width: 2px;
+  height: 48px;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 1px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hue-slider-end-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.26px;
+  color: var(--color-primary);
+  opacity: 0.88;
+  padding: 0 4px;
 }
 
 .hue-slider {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 40px;
-  border-radius: var(--radius-pill);
+  height: 48px;
+  border-radius: 22px;
   background: linear-gradient(
     to right,
-    hsl(0, 80%, 65%),
-    hsl(30, 80%, 65%),
-    hsl(60, 80%, 65%),
-    hsl(90, 80%, 65%),
-    hsl(120, 80%, 65%),
-    hsl(150, 80%, 65%),
-    hsl(180, 80%, 65%),
-    hsl(210, 80%, 65%),
-    hsl(240, 80%, 65%),
-    hsl(270, 80%, 65%),
-    hsl(300, 80%, 65%),
-    hsl(330, 80%, 65%),
-    hsl(360, 80%, 65%)
+    hsl(0, 85%, 62%),
+    hsl(30, 85%, 62%),
+    hsl(60, 80%, 58%),
+    hsl(120, 70%, 52%),
+    hsl(200, 75%, 55%),
+    hsl(280, 70%, 62%),
+    hsl(330, 85%, 68%)
   );
   outline: none;
   cursor: pointer;
+  position: relative;
+  z-index: 2;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.hue-slider::-webkit-slider-runnable-track {
+  height: 48px;
+  border-radius: 22px;
+}
+
+.hue-slider::-moz-range-track {
+  height: 48px;
+  border-radius: 22px;
 }
 
 .hue-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--color-white);
-  border: 2px solid rgba(0, 0, 0, 0.15);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  width: 56px;
+  height: 56px;
+  margin-top: -4px;
+  border-radius: 14px;
+  background: url('assets/light-slider-sticker.png') center / contain no-repeat;
+  border: none;
+  filter: drop-shadow(0 3px 10px rgba(57, 103, 189, 0.35));
   cursor: grab;
-  transition: transform 0.15s ease;
 }
 
 .hue-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.08);
+  transform: scale(1.04);
 }
 
 .hue-slider::-moz-range-thumb {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--color-white);
-  border: 2px solid rgba(0, 0, 0, 0.15);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: url('assets/light-slider-sticker.png') center / contain no-repeat;
+  border: none;
+  filter: drop-shadow(0 3px 10px rgba(57, 103, 189, 0.35));
   cursor: grab;
 }
 
-/* Light slider — Figma sticker handle (1023:2556) */
-.hue-slider--sticker-thumb {
-  height: 52px;
-}
-
-.hue-slider--sticker-thumb::-webkit-slider-thumb {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  background: url('assets/light-slider-sticker.png') center / contain no-repeat;
-  border: none;
-  box-shadow: 0 2px 10px rgba(57, 103, 189, 0.25);
-}
-
-.hue-slider--sticker-thumb::-webkit-slider-thumb:hover {
-  transform: scale(1.05);
-}
-
-.hue-slider--sticker-thumb::-moz-range-thumb {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  background: url('assets/light-slider-sticker.png') center / contain no-repeat;
-  border: none;
-  box-shadow: 0 2px 10px rgba(57, 103, 189, 0.25);
-}
-
 /* ============================================
-   Sound — 9-step slider + screentone (Figma 1023:2556)
+   Sound — unified screentone track + sticker + plumb (Figma ref. image 4)
    ============================================ */
 
 .sound-slider-block {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
-}
-
-.sound-axis-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: -0.24px;
-  color: var(--color-primary);
-  opacity: 0.85;
-  padding: 0 2px;
 }
 
 .sound-slider-lane {
+  --sound-pct: 0%;
   position: relative;
   width: 100%;
-  padding: 6px 0 10px;
+  padding: 8px 0 4px;
+}
+
+.sound-track-unified {
+  position: relative;
+  height: 44px;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: -30px;
+  z-index: 0;
+  box-shadow: inset 0 0 0 1px rgba(57, 103, 189, 0.12);
 }
 
 .sound-screentone-strip {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
-  gap: 3px;
-  height: 40px;
-  align-items: stretch;
-  margin-bottom: -26px;
+  gap: 0;
+  height: 100%;
   pointer-events: none;
 }
 
 .sound-step {
-  border-radius: 4px;
-  min-height: 36px;
-  background-color: rgba(57, 103, 189, 0.06);
-  background-image: radial-gradient(circle, rgba(57, 103, 189, 0.45) 1px, transparent 1px);
-  transition: background-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  min-height: 100%;
+  background-color: rgba(57, 103, 189, 0.07);
+  background-image: radial-gradient(circle, rgba(57, 103, 189, 0.5) 1px, transparent 1px);
+  transition: opacity 0.15s ease, background-color 0.15s ease;
 }
 
-.sound-step:nth-child(1) {
-  background-size: 9px 9px;
-  opacity: 0.65;
-}
-
-.sound-step:nth-child(2) {
-  background-size: 8px 8px;
-  opacity: 0.68;
-}
-
-.sound-step:nth-child(3) {
-  background-size: 7px 7px;
-  opacity: 0.72;
-}
-
-.sound-step:nth-child(4) {
-  background-size: 6px 6px;
-  opacity: 0.76;
-}
-
-.sound-step:nth-child(5) {
-  background-size: 5px 5px;
-  opacity: 0.8;
-}
-
-.sound-step:nth-child(6) {
-  background-size: 5px 5px;
-  opacity: 0.84;
-}
-
-.sound-step:nth-child(7) {
-  background-size: 4px 4px;
-  opacity: 0.88;
-}
-
-.sound-step:nth-child(8) {
-  background-size: 4px 4px;
-  opacity: 0.92;
-}
-
-.sound-step:nth-child(9) {
-  background-size: 3px 3px;
-  opacity: 0.95;
-}
+.sound-step:nth-child(1) { background-size: 10px 10px; opacity: 0.7; }
+.sound-step:nth-child(2) { background-size: 9px 9px; opacity: 0.74; }
+.sound-step:nth-child(3) { background-size: 8px 8px; opacity: 0.78; }
+.sound-step:nth-child(4) { background-size: 7px 7px; opacity: 0.82; }
+.sound-step:nth-child(5) { background-size: 6px 6px; opacity: 0.86; }
+.sound-step:nth-child(6) { background-size: 5px 5px; opacity: 0.88; }
+.sound-step:nth-child(7) { background-size: 4px 4px; opacity: 0.91; }
+.sound-step:nth-child(8) { background-size: 4px 4px; opacity: 0.94; }
+.sound-step:nth-child(9) { background-size: 3px 3px; opacity: 0.97; }
 
 .sound-step.is-active {
-  background-color: rgba(57, 103, 189, 0.22);
-  box-shadow: inset 0 0 0 2px var(--color-primary);
+  background-color: rgba(57, 103, 189, 0.16);
   opacity: 1;
+}
+
+.sound-slider-plumb {
+  position: absolute;
+  left: var(--sound-pct);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 0 0 1px rgba(57, 103, 189, 0.12);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .sound-slider {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 52px;
+  height: 56px;
   background: transparent;
   outline: none;
   cursor: pointer;
@@ -534,37 +494,49 @@ body.questions-page {
 }
 
 .sound-slider::-webkit-slider-runnable-track {
-  height: 40px;
+  height: 44px;
   background: transparent;
-  border-radius: 4px;
+  border-radius: 14px;
 }
 
 .sound-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 56px;
-  height: 56px;
-  margin-top: -8px;
+  width: 58px;
+  height: 58px;
+  margin-top: -7px;
   border-radius: 14px;
   background: url('assets/sound-slider-sticker.png') center / contain no-repeat;
   border: none;
-  filter: drop-shadow(0 2px 8px rgba(57, 103, 189, 0.35));
+  filter: drop-shadow(0 3px 10px rgba(57, 103, 189, 0.4));
   cursor: grab;
 }
 
 .sound-slider::-moz-range-track {
-  height: 40px;
+  height: 44px;
   background: transparent;
+  border-radius: 14px;
 }
 
 .sound-slider::-moz-range-thumb {
-  width: 56px;
-  height: 56px;
+  width: 58px;
+  height: 58px;
   border: none;
   border-radius: 14px;
   background: url('assets/sound-slider-sticker.png') center / contain no-repeat;
-  filter: drop-shadow(0 2px 8px rgba(57, 103, 189, 0.35));
+  filter: drop-shadow(0 3px 10px rgba(57, 103, 189, 0.4));
   cursor: grab;
+}
+
+.sound-end-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.26px;
+  color: var(--color-primary);
+  opacity: 0.88;
+  padding: 6px 4px 0;
 }
 
 .sound-current-name {
@@ -573,7 +545,7 @@ body.questions-page {
   font-weight: 600;
   letter-spacing: -0.3px;
   color: var(--color-primary);
-  margin: 4px 0 0;
+  margin: 6px 0 0;
 }
 
 /* ============================================

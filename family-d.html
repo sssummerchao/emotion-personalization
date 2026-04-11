@@ -36,29 +36,30 @@
       <!-- Unified card: Emotion + Light + Sound + Save (Figma 628:2143) -->
       <section class="card personalize-card">
         <div class="personalize-inner">
-          <!-- Emotion Toggle — Figma 1023:2556 -->
-          <div class="emotion-toggle emotion-toggle--feeling">
-            <button type="button" class="emotion-btn active" data-emotion="positive" aria-pressed="true">
-              <img class="emotion-icon emotion-icon-positive" src="assets/positive-white.png" alt="" width="14" height="16">
-              <span class="emotion-label-stack">
-                <span class="emotion-when">When I'm feeling</span>
-                <span class="emotion-accent">positive</span>
+          <!-- Emotion — sentence + stacked picker (Figma ref. images 2–3) -->
+          <div class="emotion-sentence" role="group" aria-label="Emotion to personalize">
+            <p class="emotion-line emotion-line--pick">
+              <span class="emotion-lead">When I'm feeling</span>
+              <span class="emotion-stack">
+                <button type="button" class="emotion-pick is-selected" data-emotion="positive" aria-pressed="true">positive,</button>
+                <button type="button" class="emotion-pick" data-emotion="negative" aria-pressed="false">negative</button>
               </span>
-            </button>
-            <button type="button" class="emotion-btn" data-emotion="negative" aria-pressed="false">
-              <img class="emotion-icon emotion-icon-negative" src="assets/negative-blue.png" alt="" width="10" height="16">
-              <span class="emotion-label-stack">
-                <span class="emotion-when">When I'm feeling</span>
-                <span class="emotion-accent">negative</span>
-              </span>
-            </button>
+            </p>
+            <p class="emotion-line emotion-line--trail">I like...</p>
           </div>
           <!-- Light (or offline banner) -->
           <div class="personalize-subsection light-subsection" id="light-section">
             <div id="light-online-content">
               <h2 class="section-label" id="light-section-label">Light color</h2>
-              <div class="hue-picker-container" id="light-controls">
-                <input type="range" id="hue-slider" class="hue-slider hue-slider--sticker-thumb" min="0" max="360" value="30" aria-label="Select light color">
+              <div class="light-slider-panel" id="light-controls">
+                <div class="hue-slider-wrap" id="hue-slider-wrap">
+                  <div class="hue-slider-plumb" id="hue-slider-plumb" aria-hidden="true"></div>
+                  <input type="range" id="hue-slider" class="hue-slider" min="0" max="360" value="30" aria-label="Select light color from vivid to mellow">
+                </div>
+                <div class="hue-slider-end-labels">
+                  <span>Vivid hue</span>
+                  <span>Mellow tint</span>
+                </div>
               </div>
             </div>
             <div class="offline-banner" id="light-offline-banner" hidden>
@@ -75,23 +76,26 @@
             <div id="sound-online-content">
               <h2 class="section-label" id="sound-section-label">Sound</h2>
               <div class="sound-slider-block" id="sound-controls">
-                <div class="sound-axis-labels">
-                  <span>calm</span>
-                  <span>intense</span>
-                </div>
-                <div class="sound-slider-lane">
-                  <div class="sound-screentone-strip" id="sound-screentone-strip">
-                    <span class="sound-step" data-step="0"></span>
-                    <span class="sound-step" data-step="1"></span>
-                    <span class="sound-step" data-step="2"></span>
-                    <span class="sound-step" data-step="3"></span>
-                    <span class="sound-step" data-step="4"></span>
-                    <span class="sound-step" data-step="5"></span>
-                    <span class="sound-step" data-step="6"></span>
-                    <span class="sound-step" data-step="7"></span>
-                    <span class="sound-step" data-step="8"></span>
+                <div class="sound-slider-lane" id="sound-slider-lane">
+                  <div class="sound-track-unified">
+                    <div class="sound-screentone-strip" id="sound-screentone-strip">
+                      <span class="sound-step" data-step="0"></span>
+                      <span class="sound-step" data-step="1"></span>
+                      <span class="sound-step" data-step="2"></span>
+                      <span class="sound-step" data-step="3"></span>
+                      <span class="sound-step" data-step="4"></span>
+                      <span class="sound-step" data-step="5"></span>
+                      <span class="sound-step" data-step="6"></span>
+                      <span class="sound-step" data-step="7"></span>
+                      <span class="sound-step" data-step="8"></span>
+                    </div>
+                    <div class="sound-slider-plumb" id="sound-slider-plumb" aria-hidden="true"></div>
                   </div>
                   <input type="range" id="sound-slider" class="sound-slider" min="0" max="8" step="1" value="0" aria-valuemin="0" aria-valuemax="8" aria-label="Sound from calm to intense" />
+                </div>
+                <div class="sound-end-labels">
+                  <span>Calm sound</span>
+                  <span>Intense noise</span>
                 </div>
                 <p class="sound-current-name" id="sound-current-name">Underwater</p>
               </div>
