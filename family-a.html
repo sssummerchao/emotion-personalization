@@ -29,9 +29,13 @@
     <!-- Personalization Screen (592:1570, 628:2143, 631:2690, 632:2969, 632:2838) - hidden until master is online -->
     <div id="screen-personalize" class="root screen" hidden style="display: none;">
       <!-- Emotion hero (replaces welcome block; Figma ref. image 2) -->
-      <div class="emotion-sentence" role="group" aria-label="My emotion is positive and negative">
+      <div class="emotion-sentence" role="group" aria-label="My emotion is positive or negative">
         <p class="emotion-line emotion-line--title">
-          <span class="emotion-lead">My emotion is </span><button type="button" class="emotion-pick is-selected" data-emotion="positive" aria-pressed="true">positive</button><span class="emotion-lead"> and </span><button type="button" class="emotion-pick" data-emotion="negative" aria-pressed="false">negative</button>
+          <span class="emotion-lead emotion-lead--head">My emotion is</span>
+          <span class="emotion-picks">
+            <button type="button" class="emotion-pick is-selected" data-emotion="positive" aria-pressed="true">positive</button>
+            <button type="button" class="emotion-pick" data-emotion="negative" aria-pressed="false">negative</button>
+          </span>
         </p>
       </div>
 
