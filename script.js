@@ -48,6 +48,45 @@ const SOUND_STEPS = [
 
 const TRACKS = Object.fromEntries(SOUND_STEPS.map((s) => [s.id, s.label]));
 
+/** Matches `::-webkit-slider-thumb` / `::-moz-range-thumb` width on hue + sound sliders */
+const SLIDER_THUMB_WIDTH_PX = 70;
+
+/**
+ * Horizontal % where the thumb center sits (same geometry browsers use for range inputs).
+ * `norm` is 0 at min, 1 at max.
+ */
+function thumbCenterPercentFromNorm(sliderEl, norm) {
+  const w = sliderEl?.offsetWidth ?? 0;
+  if (w < 1) return Math.max(0, Math.min(100, norm * 100));
+  const t = SLIDER_THUMB_WIDTH_PX;
+  const u = Math.max(0, Math.min(1, norm));
+  const centerFrac = t / (2 * w) + u * (1 - t / w);
+  return Math.max(0, Math.min(100, centerFrac * 100));
+}
+
+let sliderPlumbLayoutScheduled = false;
+function scheduleSliderPlumbLayout() {
+  if (sliderPlumbLayoutScheduled) return;
+  sliderPlumbLayoutScheduled = true;
+  requestAnimationFrame(() => {
+    sliderPlumbLayoutScheduled = false;
+    const hueSlider = document.getElementById('hue-slider');
+    if (hueSlider) updateHuePlumb(parseInt(hueSlider.value, 10));
+    const soundSlider = document.getElementById('sound-slider');
+    if (soundSlider) updateSoundStepUI(parseInt(soundSlider.value, 10));
+  });
+}
+
+function initSliderPlumbSync() {
+  window.addEventListener('resize', scheduleSliderPlumbLayout);
+  const wrap = document.getElementById('hue-slider-wrap');
+  const lane = document.getElementById('sound-slider-lane');
+  if (typeof ResizeObserver === 'undefined') return;
+  const ro = new ResizeObserver(() => scheduleSliderPlumbLayout());
+  if (wrap) ro.observe(wrap);
+  if (lane) ro.observe(lane);
+}
+
 function trackIdToStepIndex(trackId) {
   if (!trackId) return 0;
   const i = SOUND_STEPS.findIndex((s) => s.id === trackId);
@@ -215,6 +254,8 @@ function applyDeviceStatus() {
     saveBtn.classList.toggle('save-disabled', idle.disabled);
     saveBtn.textContent = idle.label;
   }
+
+  scheduleSliderPlumbLayout();
 }
 
 function syncToPhoton(emotion, personalizing = false) {
@@ -269,9 +310,11 @@ function init() {
   initColorSwitcher();
   initSoundSlider();
   initSaveButton();
+  initSliderPlumbSync();
   applyStateToUI();
   applyDeviceStatus();  // Show master-offline by default (avoids blink when master is offline)
   initDeviceStatus();
+  scheduleSliderPlumbLayout();
 }
 
 async function initDeviceStatus() {
@@ -368,9 +411,11 @@ function applyStateToUI() {
 
 function updateHuePlumb(hue) {
   const wrap = document.getElementById('hue-slider-wrap');
-  const h = typeof hue === 'number' ? hue : parseInt(document.getElementById('hue-slider')?.value || '0', 10);
-  if (wrap && !Number.isNaN(h)) {
-    const pct = Math.max(0, Math.min(100, (h / 360) * 100));
+  const hueSlider = document.getElementById('hue-slider');
+  const h = typeof hue === 'number' ? hue : parseInt(hueSlider?.value || '0', 10);
+  if (wrap && hueSlider && !Number.isNaN(h)) {
+    const norm = h / 360;
+    const pct = thumbCenterPercentFromNorm(hueSlider, norm);
     wrap.style.setProperty('--hue-pct', `${pct}%`);
   }
 }
@@ -382,8 +427,9 @@ function updateSoundStepUI(stepIndex) {
   const step = SOUND_STEPS[stepIndex];
   if (nameEl && step) nameEl.textContent = step.label;
   if (soundSlider && step) soundSlider.setAttribute('aria-valuetext', step.label);
-  if (lane) {
-    const pct = (stepIndex / 8) * 100;
+  if (lane && soundSlider) {
+    const norm = Math.max(0, Math.min(1, stepIndex / 8));
+    const pct = thumbCenterPercentFromNorm(soundSlider, norm);
     lane.style.setProperty('--sound-pct', `${pct}%`);
   }
   document.querySelectorAll('.sound-step').forEach((el, i) => {
