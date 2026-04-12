@@ -132,7 +132,7 @@ body.questions-page {
 .emotion-sentence {
   padding: 0 14px 20px;
   margin-bottom: 4px;
-  text-align: left;
+  text-align: center;
   background: transparent;
   font-family: var(--font-display);
   font-size: 30px;
@@ -151,12 +151,12 @@ body.questions-page {
   font-weight: 300;
 }
 
-.emotion-line--pick {
+.emotion-line--title {
   display: flex;
-  flex-wrap: nowrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px 16px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -166,24 +166,14 @@ body.questions-page {
 }
 
 .emotion-lead {
-  flex: 0 1 auto;
   color: var(--dark-blue, #3967bd);
   font-weight: 300;
 }
 
-.emotion-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  flex: 0 0 auto;
-  gap: 0;
-  text-align: right;
-}
-
 .emotion-pick {
-  display: block;
+  display: inline;
   margin: 0;
-  padding: 0;
+  padding: 0 1px;
   border: none;
   background: none;
   font-family: inherit;
@@ -192,20 +182,18 @@ body.questions-page {
   line-height: 42px;
   letter-spacing: -0.6px;
   cursor: pointer;
-  text-align: right;
+  text-align: inherit;
   color: var(--dark-blue, #3967bd);
-  transition: opacity 0.15s ease;
+  transition: opacity 0.15s ease, font-weight 0.15s ease;
 }
 
 .emotion-pick.is-selected {
-  order: 0;
   font-weight: 600;
   color: var(--dark-blue, #3967bd);
   opacity: 1;
 }
 
 .emotion-pick:not(.is-selected) {
-  order: 1;
   font-weight: 300;
   opacity: 0.42;
 }
@@ -215,13 +203,8 @@ body.questions-page {
 }
 
 @media (max-width: 400px) {
-  .emotion-line--pick {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-  }
-
-  .emotion-stack {
-    margin-left: auto;
+  .emotion-line--title {
+    justify-content: center;
   }
 }
 
@@ -344,6 +327,8 @@ body.questions-page {
    ============================================ */
 
 .light-slider-panel {
+  /* Half of 70px thumb — inset painted track so bar ends match thumb center travel */
+  --slider-thumb-half: 35px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -363,8 +348,8 @@ body.questions-page {
 .hue-slider-wrap::before {
   content: '';
   position: absolute;
-  left: 0;
-  right: 0;
+  left: var(--slider-thumb-half);
+  right: var(--slider-thumb-half);
   top: 52px;
   height: 48px;
   border-radius: 22px;
@@ -405,7 +390,7 @@ body.questions-page {
   letter-spacing: -0.26px;
   color: var(--color-primary);
   opacity: 0.88;
-  padding: 0 4px;
+  padding: 0 calc(4px + var(--slider-thumb-half));
 }
 
 .hue-slider {
@@ -469,6 +454,7 @@ body.questions-page {
    ============================================ */
 
 .sound-slider-block {
+  --slider-thumb-half: 35px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -488,6 +474,9 @@ body.questions-page {
   height: 50px;
   border-radius: 22px;
   overflow: hidden;
+  width: calc(100% - (2 * var(--slider-thumb-half)));
+  margin-left: var(--slider-thumb-half);
+  margin-right: var(--slider-thumb-half);
   margin-bottom: -30px;
   z-index: 0;
   background: var(--dark-blue, #3967bd);
@@ -601,7 +590,7 @@ body.questions-page {
   letter-spacing: -0.26px;
   color: var(--color-primary);
   opacity: 0.88;
-  padding: 6px 4px 0;
+  padding: 6px calc(4px + var(--slider-thumb-half)) 0;
 }
 
 /* ============================================
