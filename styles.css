@@ -351,7 +351,7 @@ body.questions-page {
   left: var(--slider-thumb-half);
   right: var(--slider-thumb-half);
   top: 52px;
-  height: 48px;
+  height: 40px;
   border-radius: 22px;
   z-index: 0;
   pointer-events: none;
@@ -373,7 +373,7 @@ body.questions-page {
   left: var(--hue-pct);
   top: 52px;
   width: 2px;
-  height: 48px;
+  height: 40px;
   transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.95);
   border-radius: 1px;
@@ -424,8 +424,8 @@ body.questions-page {
   width: 70px;
   min-width: 70px;
   height: 70px;
-  /* Pull thumb above track so sticker clears the bar (40px track; 70px thumb) */
-  margin-top: -70px;
+  /* Slightly less pull-up than sound so sticker sits closer to the bar (matches 40px track) */
+  margin-top: -56px;
   border-radius: 16px;
   background: url('assets/light-slider-sticker.png') center / contain no-repeat;
   border: none;
@@ -441,7 +441,7 @@ body.questions-page {
   width: 70px;
   min-width: 70px;
   height: 70px;
-  margin-top: -70px;
+  margin-top: -56px;
   border-radius: 16px;
   background: url('assets/light-slider-sticker.png') center / contain no-repeat;
   border: none;

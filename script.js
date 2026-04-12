@@ -455,11 +455,7 @@ function updateEmotionPickerUI() {
     const on = state.emotion === em;
     btn.classList.toggle('is-selected', on);
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-    if (em === 'positive') {
-      btn.textContent = on ? 'positive,' : 'positive';
-    } else {
-      btn.textContent = on ? 'negative,' : 'negative';
-    }
+    btn.textContent = (em === 'positive' ? 'positive' : 'negative').replace(/,/g, '');
   });
 }
 
