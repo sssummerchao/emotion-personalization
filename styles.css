@@ -399,7 +399,7 @@ body.questions-page {
   display: flex;
   justify-content: space-between;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: -0.26px;
   color: var(--color-primary);
   opacity: 0.88;
@@ -488,13 +488,13 @@ body.questions-page {
 
 .sound-track-unified {
   position: relative;
-  height: 50px;
+  height: 40px;
   border-radius: 22px;
   overflow: hidden;
   width: calc(100% - (2 * var(--slider-thumb-half)));
   margin-left: var(--slider-thumb-half);
   margin-right: var(--slider-thumb-half);
-  margin-bottom: -30px;
+  margin-bottom: -24px;
   z-index: 0;
   background: var(--dark-blue, #3967bd);
   box-shadow:
@@ -540,7 +540,7 @@ body.questions-page {
   left: var(--sound-pct);
   top: 0;
   width: 2px;
-  height: 50px;
+  height: 40px;
   transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 0 0 1px rgba(57, 103, 189, 0.12);
@@ -606,7 +606,7 @@ body.questions-page {
   display: flex;
   justify-content: space-between;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: -0.26px;
   color: var(--color-primary);
   opacity: 0.88;
