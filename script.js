@@ -49,7 +49,7 @@ const SOUND_STEPS = [
 const TRACKS = Object.fromEntries(SOUND_STEPS.map((s) => [s.id, s.label]));
 
 /** Matches `::-webkit-slider-thumb` / `::-moz-range-thumb` width on hue + sound sliders */
-const SLIDER_THUMB_WIDTH_PX = 70;
+const SLIDER_THUMB_WIDTH_PX = 81;
 
 /**
  * Horizontal % where the thumb center sits (same geometry browsers use for range inputs).
@@ -141,6 +141,35 @@ function setCurrentState(updates, personalizing = true) {
   if (state.devices.master) {
     syncToPhoton(state.emotion, personalizing);
   }
+}
+
+/**
+ * While dragging sliders: push hue/track to devices without writing localStorage
+ * (change still runs setCurrentState to persist). First move syncs immediately; then ~45ms debounce.
+ */
+let livePersonalizeTimer = null;
+let livePersonalizeImmediateNext = false;
+
+function clearLivePersonalizeDebounce() {
+  if (livePersonalizeTimer) {
+    clearTimeout(livePersonalizeTimer);
+    livePersonalizeTimer = null;
+  }
+}
+
+function pushLivePersonalize(updates) {
+  Object.assign(state[state.emotion], updates);
+  if (!state.devices.master) return;
+  if (livePersonalizeImmediateNext) {
+    syncToPhoton(state.emotion, true);
+    livePersonalizeImmediateNext = false;
+    return;
+  }
+  if (livePersonalizeTimer) clearTimeout(livePersonalizeTimer);
+  livePersonalizeTimer = setTimeout(() => {
+    livePersonalizeTimer = null;
+    syncToPhoton(state.emotion, true);
+  }, 45);
 }
 
 function parseBool(val) {
@@ -474,13 +503,25 @@ function initEmotionToggle() {
 function initColorSwitcher() {
   const hueSlider = document.getElementById('hue-slider');
   if (!hueSlider) return;
+  hueSlider.addEventListener('pointerdown', () => {
+    clearLivePersonalizeDebounce();
+    livePersonalizeImmediateNext = true;
+  });
+  hueSlider.addEventListener('pointerup', () => {
+    livePersonalizeImmediateNext = false;
+  });
+  hueSlider.addEventListener('pointercancel', () => {
+    livePersonalizeImmediateNext = false;
+  });
   hueSlider.addEventListener('input', () => {
     const hue = parseInt(hueSlider.value, 10);
     updateHuePreview(hue);
     updateHuePlumb(hue);
+    pushLivePersonalize({ hue });
   });
   hueSlider.addEventListener('change', () => {
     const hue = parseInt(hueSlider.value, 10);
+    clearLivePersonalizeDebounce();
     setCurrentState({ hue });
   });
 }
@@ -489,12 +530,25 @@ function initSoundSlider() {
   const soundSlider = document.getElementById('sound-slider');
   if (!soundSlider) return;
 
+  soundSlider.addEventListener('pointerdown', () => {
+    clearLivePersonalizeDebounce();
+    livePersonalizeImmediateNext = true;
+  });
+  soundSlider.addEventListener('pointerup', () => {
+    livePersonalizeImmediateNext = false;
+  });
+  soundSlider.addEventListener('pointercancel', () => {
+    livePersonalizeImmediateNext = false;
+  });
   soundSlider.addEventListener('input', () => {
     const idx = parseInt(soundSlider.value, 10);
     updateSoundStepUI(idx);
+    const trackId = stepIndexToTrackId(idx);
+    pushLivePersonalize({ selectedTrack: trackId });
   });
   soundSlider.addEventListener('change', () => {
     const idx = parseInt(soundSlider.value, 10);
+    clearLivePersonalizeDebounce();
     const trackId = stepIndexToTrackId(idx);
     setCurrentState({ selectedTrack: trackId });
   });
