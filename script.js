@@ -138,31 +138,43 @@ async function fetchDeviceStatus() {
   return state.devices;
 }
 
+function getSaveButtonIdleState() {
+  const { master, light, sound } = state.devices;
+  const canSave = master && (light || sound);
+  return {
+    disabled: !canSave,
+    label: !canSave ? (master ? 'No devices available' : 'Master offline') : 'Save emotion',
+  };
+}
+
 function applyDeviceStatus() {
   const { master, light, sound } = state.devices;
 
   const screenMasterOffline = document.getElementById('screen-master-offline');
   const screenPersonalize = document.getElementById('screen-personalize');
 
+  // Master unreachable: still show personalize so hue/sound changes persist to localStorage and sliders work.
+  // Cloud preview/sync stay gated on state.devices.master (syncToPhoton / save).
   if (!master) {
+    document.body.classList.add('personalize-master-unreachable');
     if (screenMasterOffline) {
       screenMasterOffline.hidden = false;
       screenMasterOffline.style.display = '';
     }
     if (screenPersonalize) {
-      screenPersonalize.hidden = true;
-      screenPersonalize.style.display = 'none';
+      screenPersonalize.hidden = false;
+      screenPersonalize.style.display = '';
     }
-    return;
-  }
-
-  if (screenMasterOffline) {
-    screenMasterOffline.hidden = true;
-    screenMasterOffline.style.display = 'none';
-  }
-  if (screenPersonalize) {
-    screenPersonalize.hidden = false;
-    screenPersonalize.style.display = '';
+  } else {
+    document.body.classList.remove('personalize-master-unreachable');
+    if (screenMasterOffline) {
+      screenMasterOffline.hidden = true;
+      screenMasterOffline.style.display = 'none';
+    }
+    if (screenPersonalize) {
+      screenPersonalize.hidden = false;
+      screenPersonalize.style.display = '';
+    }
   }
 
   // Light section - when offline: hide entire online block (label + controls), show only offline banner
@@ -196,18 +208,18 @@ function applyDeviceStatus() {
     if (soundSection) soundSection.classList.toggle('sound-offline', !sound);
   }
 
-  // Save button
   const saveBtn = document.getElementById('save-to-device');
   if (saveBtn) {
-    const anyDevice = light || sound;
-    saveBtn.disabled = !anyDevice;
-    saveBtn.classList.toggle('save-disabled', !anyDevice);
-    saveBtn.textContent = !anyDevice ? 'No devices available' : 'Save emotion';
+    const idle = getSaveButtonIdleState();
+    saveBtn.disabled = idle.disabled;
+    saveBtn.classList.toggle('save-disabled', idle.disabled);
+    saveBtn.textContent = idle.label;
   }
 }
 
 function syncToPhoton(emotion, personalizing = false) {
   if (!state.devices.master) return;
+  const errEl = document.getElementById('save-error');
   const s = state[emotion];
   const payload = {
     setup: getSetupId(),
@@ -224,8 +236,21 @@ function syncToPhoton(emotion, personalizing = false) {
   })
     .then((r) => {
       if (!r.ok) return r.json().then((d) => Promise.reject(d));
+      if (personalizing && errEl) {
+        errEl.textContent = '';
+        errEl.hidden = true;
+      }
     })
-    .catch((err) => console.warn('Photon sync failed:', err?.error || err));
+    .catch((err) => {
+      console.warn('Photon sync failed:', err?.error || err);
+      if (personalizing && errEl) {
+        errEl.textContent =
+          err?.error ||
+          (typeof err === 'string' ? err : '') ||
+          'Preview could not reach the device. Check Vercel env (PARTICLE_*_SETUP2 / _SETUP3) and token.';
+        errEl.hidden = false;
+      }
+    });
 }
 
 function hideLoadingScreen() {
@@ -460,7 +485,12 @@ function initSaveButton() {
     fetch('/api/photon', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'save', setup: getSetupId() }),
+      body: JSON.stringify({
+        action: 'save',
+        setup: getSetupId(),
+        positive: { hue: state.positive.hue, selectedTrack: state.positive.selectedTrack || '' },
+        negative: { hue: state.negative.hue, selectedTrack: state.negative.selectedTrack || '' },
+      }),
     })
       .then((r) => r.json().catch(() => ({})))
       .then((data) => {
@@ -468,23 +498,27 @@ function initSaveButton() {
           btn.textContent = 'Emotion saved!';
           clearError();
         } else {
-          btn.textContent = state.devices.light || state.devices.sound ? 'Save emotion' : 'No devices available';
+          const idle = getSaveButtonIdleState();
+          btn.textContent = idle.label;
           const msg = data.error || data.details?.error_description || JSON.stringify(data);
           showError(msg);
         }
         setTimeout(() => {
-          btn.disabled = !(state.devices.light || state.devices.sound);
-          btn.classList.toggle('save-disabled', btn.disabled);
-          btn.textContent = btn.disabled ? 'No devices available' : 'Save emotion';
+          const idle = getSaveButtonIdleState();
+          btn.disabled = idle.disabled;
+          btn.classList.toggle('save-disabled', idle.disabled);
+          btn.textContent = idle.label;
         }, 3000);
       })
       .catch((err) => {
-        btn.textContent = state.devices.light || state.devices.sound ? 'Save emotion' : 'No devices available';
+        const idle = getSaveButtonIdleState();
+        btn.textContent = idle.label;
         showError(err?.message || 'Network error — check console');
         setTimeout(() => {
-          btn.disabled = !(state.devices.light || state.devices.sound);
-          btn.classList.toggle('save-disabled', btn.disabled);
-          btn.textContent = btn.disabled ? 'No devices available' : 'Save emotion';
+          const idle2 = getSaveButtonIdleState();
+          btn.disabled = idle2.disabled;
+          btn.classList.toggle('save-disabled', idle2.disabled);
+          btn.textContent = idle2.label;
         }, 3000);
       });
   });

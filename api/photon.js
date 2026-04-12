@@ -2,7 +2,7 @@
  * Vercel serverless function: forwards web state to Particle device
  * Requires env: PARTICLE_ACCESS_TOKEN, PARTICLE_DEVICE_ID (and _SETUP1–3 per family)
  */
-import { getMasterDeviceId } from './deviceEnv.js';
+import { getMasterDeviceId, resolveSetup } from './deviceEnv.js';
 
 export default async function handler(req, res) {
   const token = process.env.PARTICLE_ACCESS_TOKEN;
@@ -37,17 +37,34 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid JSON body' });
     }
   }
-  const { action, emotion, hue, selectedTrack, personalizing, previewDurationSec, setup } = body || {};
-  const deviceId = getMasterDeviceId(setup);
+  const {
+    action,
+    emotion,
+    hue,
+    selectedTrack,
+    personalizing,
+    previewDurationSec,
+    setup,
+    positive,
+    negative,
+  } = body || {};
+  const setupIndex = resolveSetup(setup);
+  const deviceId = getMasterDeviceId(setupIndex);
 
   if (!token || !deviceId) {
     return res.status(500).json({
       error: 'Server not configured. Set PARTICLE_ACCESS_TOKEN and the master PARTICLE_DEVICE_ID for this family (or _SETUP1 / _SETUP2 / _SETUP3) in Vercel environment variables.',
+      setup: setupIndex,
     });
   }
 
   if (action === 'save') {
-    const arg = JSON.stringify({ save: true });
+    const snap = {};
+    if (positive && typeof positive.hue === 'number') snap.hp = Math.max(0, Math.min(360, positive.hue | 0));
+    if (negative && typeof negative.hue === 'number') snap.hn = Math.max(0, Math.min(360, negative.hue | 0));
+    if (positive && typeof positive.selectedTrack === 'string' && positive.selectedTrack) snap.tps = positive.selectedTrack;
+    if (negative && typeof negative.selectedTrack === 'string' && negative.selectedTrack) snap.tns = negative.selectedTrack;
+    const arg = JSON.stringify(Object.keys(snap).length ? { save: true, ...snap } : { save: true });
     try {
       const resp = await fetch(
         `https://api.particle.io/v1/devices/${deviceId}/setState`,

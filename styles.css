@@ -395,7 +395,7 @@ body.questions-page {
 .hue-slider-plumb {
   position: absolute;
   left: var(--hue-pct);
-  top: 4px;
+  top: 52px;
   width: 2px;
   height: 48px;
   transform: translateX(-50%);
@@ -421,7 +421,7 @@ body.questions-page {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 48px;
+  height: 40px;
   border-radius: 22px;
   background: transparent;
   outline: none;
@@ -431,13 +431,13 @@ body.questions-page {
 }
 
 .hue-slider::-webkit-slider-runnable-track {
-  height: 48px;
+  height: 40px;
   border-radius: 22px;
   background: transparent;
 }
 
 .hue-slider::-moz-range-track {
-  height: 48px;
+  height: 40px;
   border-radius: 22px;
   background: transparent;
 }
@@ -448,7 +448,7 @@ body.questions-page {
   width: 70px;
   min-width: 70px;
   height: 70px;
-  /* Pull thumb above track so sticker clears the bar (48px track; 70px thumb) */
+  /* Pull thumb above track so sticker clears the bar (40px track; 70px thumb) */
   margin-top: -70px;
   border-radius: 16px;
   background: url('assets/light-slider-sticker.png') center / contain no-repeat;
@@ -494,10 +494,10 @@ body.questions-page {
 
 .sound-track-unified {
   position: relative;
-  height: 30px;
-  border-radius: 16px;
+  height: 50px;
+  border-radius: 22px;
   overflow: hidden;
-  margin-bottom: -30px;
+  margin-bottom: -50px;
   z-index: 0;
   background: var(--dark-blue, #3967bd);
   box-shadow:
@@ -541,9 +541,9 @@ body.questions-page {
 .sound-slider-plumb {
   position: absolute;
   left: var(--sound-pct);
-  top: 52px;
+  top: 53px;
   width: 2px;
-  height: 30px;
+  height: 48px;
   transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 0 0 1px rgba(57, 103, 189, 0.12);
@@ -555,7 +555,7 @@ body.questions-page {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 30px;
+  height: 20px;
   background: transparent;
   outline: none;
   cursor: pointer;
@@ -565,7 +565,7 @@ body.questions-page {
 }
 
 .sound-slider::-webkit-slider-runnable-track {
-  height: 30px;
+  height: 20px;
   background: transparent;
   border-radius: 16px;
 }
@@ -585,7 +585,7 @@ body.questions-page {
 }
 
 .sound-slider::-moz-range-track {
-  height: 30px;
+  height: 20px;
   background: transparent;
   border-radius: 16px;
 }
