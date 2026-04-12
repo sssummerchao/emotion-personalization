@@ -352,8 +352,8 @@ body.questions-page {
   position: relative;
   --hue-pct: 8.33%;
   width: 100%;
-  /* Room above track for sticker + vertical plumb (sticker sits in padding, not on bar) */
-  padding: 52px 0 8px;
+  /* Room below track for sticker + plumb; labels sit above (see .light-slider-panel order) */
+  padding: 0 0 56px;
   isolation: isolate;
 }
 
@@ -363,7 +363,7 @@ body.questions-page {
   position: absolute;
   left: var(--slider-thumb-half);
   right: var(--slider-thumb-half);
-  top: 52px;
+  top: 0;
   height: 40px;
   border-radius: 22px;
   z-index: 0;
@@ -384,7 +384,7 @@ body.questions-page {
 .hue-slider-plumb {
   position: absolute;
   left: var(--hue-pct);
-  top: 52px;
+  top: 0;
   width: 2px;
   height: 40px;
   transform: translateX(-50%);
@@ -403,7 +403,8 @@ body.questions-page {
   letter-spacing: -0.26px;
   color: var(--color-primary);
   opacity: 0.88;
-  padding: 0 calc(4px + var(--slider-thumb-half));
+  padding: 0 calc(4px + var(--slider-thumb-half)) 6px;
+  order: -1;
 }
 
 .hue-slider {
@@ -417,6 +418,7 @@ body.questions-page {
   cursor: pointer;
   position: relative;
   z-index: 2;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .hue-slider::-webkit-slider-runnable-track {
@@ -437,12 +439,13 @@ body.questions-page {
   width: 70px;
   min-width: 70px;
   height: 70px;
-  /* Slightly less pull-up than sound so sticker sits closer to the bar (matches 40px track) */
-  margin-top: -56px;
+  /* Sticker sits below the track (padding-bottom on wrap); positive margin pulls thumb down */
+  margin-top: 32px;
   border-radius: 16px;
   background: url('assets/light-slider-sticker.png') center / contain no-repeat;
   border: none;
-  filter: drop-shadow(0 3px 10px rgba(57, 103, 189, 0.35));
+  box-shadow: none;
+  filter: none;
   cursor: grab;
 }
 
@@ -454,11 +457,12 @@ body.questions-page {
   width: 70px;
   min-width: 70px;
   height: 70px;
-  margin-top: -56px;
+  margin-top: 32px;
   border-radius: 16px;
   background: url('assets/light-slider-sticker.png') center / contain no-repeat;
   border: none;
-  filter: drop-shadow(0 3px 10px rgba(57, 103, 189, 0.35));
+  box-shadow: none;
+  filter: none;
   cursor: grab;
 }
 
@@ -478,7 +482,7 @@ body.questions-page {
   --sound-pct: 0%;
   position: relative;
   width: 100%;
-  padding: 52px 0 8px;
+  padding: 0 0 56px;
   isolation: isolate;
 }
 
@@ -534,9 +538,9 @@ body.questions-page {
 .sound-slider-plumb {
   position: absolute;
   left: var(--sound-pct);
-  top: 53px;
+  top: 0;
   width: 2px;
-  height: 48px;
+  height: 50px;
   transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 0 0 1px rgba(57, 103, 189, 0.12);
@@ -555,6 +559,7 @@ body.questions-page {
   position: relative;
   z-index: 3;
   margin: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .sound-slider::-webkit-slider-runnable-track {
@@ -569,11 +574,12 @@ body.questions-page {
   width: 70px;
   min-width: 70px;
   height: 70px;
-  margin-top: -70px;
+  margin-top: 28px;
   border-radius: 16px;
   background: url('assets/sound-slider-sticker.png') center / contain no-repeat;
   border: none;
-  filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.2));
+  box-shadow: none;
+  filter: none;
   cursor: grab;
 }
 
@@ -587,11 +593,12 @@ body.questions-page {
   width: 70px;
   min-width: 70px;
   height: 70px;
-  margin-top: -70px;
+  margin-top: 28px;
   border: none;
   border-radius: 16px;
   background: url('assets/sound-slider-sticker.png') center / contain no-repeat;
-  filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.2));
+  box-shadow: none;
+  filter: none;
   cursor: grab;
 }
 
@@ -603,7 +610,8 @@ body.questions-page {
   letter-spacing: -0.26px;
   color: var(--color-primary);
   opacity: 0.88;
-  padding: 6px calc(4px + var(--slider-thumb-half)) 0;
+  padding: 0 calc(4px + var(--slider-thumb-half)) 6px;
+  order: -1;
 }
 
 /* ============================================
@@ -720,38 +728,19 @@ body.questions-page {
 }
 
 #screen-master-offline {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-}
-
-/* Master ping failed: show warning strip + allow personalize (localStorage + sliders) */
-body.personalize-master-unreachable {
-  overflow: auto;
-  height: auto;
-  min-height: 100vh;
-}
-
-body.personalize-master-unreachable #screen-master-offline {
-  min-height: unset;
-  padding: 12px 16px 8px;
-  flex-shrink: 0;
-}
-
-body.personalize-master-unreachable #screen-master-offline .blocked-illustration {
-  width: 96px;
-  height: 96px;
-  margin-bottom: 10px;
-}
-
-body.personalize-master-unreachable #screen-master-offline .blocked-title {
-  font-size: 18px;
-  margin-bottom: 8px;
-}
-
-body.personalize-master-unreachable #screen-master-offline .blocked-message {
-  font-size: 14px;
+  min-height: 100dvh;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: max(24px, env(safe-area-inset-top, 0px)) 16px max(32px, env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  background: var(--color-bg);
 }
 
 .blocked-content {

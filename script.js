@@ -192,20 +192,18 @@ function applyDeviceStatus() {
   const screenMasterOffline = document.getElementById('screen-master-offline');
   const screenPersonalize = document.getElementById('screen-personalize');
 
-  // Master unreachable: still show personalize so hue/sound changes persist to localStorage and sliders work.
+  // Master offline: full-page offline screen only (no personalize UI underneath).
   // Cloud preview/sync stay gated on state.devices.master (syncToPhoton / save).
   if (!master) {
-    document.body.classList.add('personalize-master-unreachable');
     if (screenMasterOffline) {
       screenMasterOffline.hidden = false;
       screenMasterOffline.style.display = '';
     }
     if (screenPersonalize) {
-      screenPersonalize.hidden = false;
-      screenPersonalize.style.display = '';
+      screenPersonalize.hidden = true;
+      screenPersonalize.style.display = 'none';
     }
   } else {
-    document.body.classList.remove('personalize-master-unreachable');
     if (screenMasterOffline) {
       screenMasterOffline.hidden = true;
       screenMasterOffline.style.display = 'none';
@@ -305,6 +303,7 @@ function hideLoadingScreen() {
 }
 
 function init() {
+  document.body.classList.remove('personalize-master-unreachable');
   loadFromStorage();
   initEmotionToggle();
   initColorSwitcher();
