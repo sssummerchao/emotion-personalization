@@ -82,9 +82,62 @@ export default async function handler(req, res) {
           details: data,
         });
       }
+      if (data.return_value === -2) {
+        return res.status(423).json({
+          error: 'The other home is in an emotion session. Try again when it ends.',
+          code: 'WEB_EMOTION_RX_LOCKED',
+        });
+      }
       return res.status(200).json({ ok: true, saved: true });
     } catch (err) {
       console.error('Photon save error:', err);
+      return res.status(500).json({ error: 'Failed to reach Particle cloud' });
+    }
+  }
+
+  if (action === 'sendEmotion') {
+    if (setupIndex !== 2) {
+      return res.status(403).json({ error: 'Send emotion is only available for Family C.' });
+    }
+    if (!emotion || (emotion !== 'positive' && emotion !== 'negative')) {
+      return res.status(400).json({ error: 'Missing or invalid emotion' });
+    }
+    const trackNum = selectedTrack ? parseInt(selectedTrack, 10) || 1 : 1;
+    const argObj = {
+      send: true,
+      e: emotion,
+      h: typeof hue === 'number' ? hue : (emotion === 'positive' ? 30 : 210),
+      t: selectedTrack || '',
+      n: trackNum,
+      m: 50,
+    };
+    const arg = JSON.stringify(argObj);
+    try {
+      const resp = await fetch(
+        `https://api.particle.io/v1/devices/${deviceId}/setState`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ access_token: token, arg }),
+        }
+      );
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok) {
+        const errMsg = data.error_description || data.error || `Particle API error (${resp.status})`;
+        return res.status(resp.status).json({
+          error: errMsg,
+          details: data,
+        });
+      }
+      if (data.return_value === -2) {
+        return res.status(423).json({
+          error: 'The other home is in an emotion session. Try again when it ends.',
+          code: 'WEB_EMOTION_RX_LOCKED',
+        });
+      }
+      return res.status(200).json({ ok: true, sent: true });
+    } catch (err) {
+      console.error('Photon sendEmotion error:', err);
       return res.status(500).json({ error: 'Failed to reach Particle cloud' });
     }
   }
@@ -125,6 +178,12 @@ export default async function handler(req, res) {
       return res.status(resp.status).json({
         error: errMsg,
         details: data,
+      });
+    }
+    if (data.return_value === -2) {
+      return res.status(423).json({
+        error: 'The other home is in an emotion session. Try again when it ends.',
+        code: 'WEB_EMOTION_RX_LOCKED',
       });
     }
     return res.status(200).json({ ok: true, return_value: data.return_value });
