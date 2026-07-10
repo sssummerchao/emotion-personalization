@@ -30,7 +30,8 @@ const state = {
   emotion: 'positive',
   positive: { ...DEFAULT_STATE, hue: 30 },
   negative: { ...DEFAULT_STATE, hue: 210 },
-  devices: { master: false, light: true, sound: true },  // assume master offline until API responds (avoids blink)
+  // webEmotionRxLocked: Pair 1 (C/D) — firmware blocks setState while peer bus session (sa≠0) is active.
+  devices: { master: false, light: true, sound: true, webEmotionRxLocked: false },
 };
 
 // Track metadata (DFPlayer file IDs → label). Calm → intense order for sound slider:
@@ -98,8 +99,8 @@ function stepIndexToTrackId(index) {
   return SOUND_STEPS[clamped].id;
 }
 
-// Device status: each poll hits Particle (up to 3 ping calls per family). Kept conservative;
-// polling pauses while the tab is hidden. Raise interval if you need fewer API operations.
+// Device status: each poll hits Particle (pings + variable read for C/D). Polling pauses while hidden.
+// When `webEmotionRxLocked` is true, polls every 4s so the UI unlocks soon after the peer session ends.
 const POLL_INTERVAL_MS = 15000;
 const INIT_FETCH_TIMEOUT_MS = 8000;  // hide loading screen after this even if API hangs
 
@@ -138,7 +139,7 @@ function getCurrentState() {
 function setCurrentState(updates, personalizing = true) {
   Object.assign(state[state.emotion], updates);
   saveToStorage();
-  if (state.devices.master) {
+  if (state.devices.master && !state.devices.webEmotionRxLocked) {
     syncToPhoton(state.emotion, personalizing);
   }
 }
@@ -159,7 +160,7 @@ function clearLivePersonalizeDebounce() {
 
 function pushLivePersonalize(updates) {
   Object.assign(state[state.emotion], updates);
-  if (!state.devices.master) return;
+  if (!state.devices.master || state.devices.webEmotionRxLocked) return;
   if (livePersonalizeImmediateNext) {
     syncToPhoton(state.emotion, true);
     livePersonalizeImmediateNext = false;
@@ -193,6 +194,7 @@ async function fetchDeviceStatus() {
       master: data.master !== false,
       light: data.light !== false,
       sound: data.sound !== false,
+      webEmotionRxLocked: !!data.webEmotionRxLocked,
     };
   } catch (e) {
     if (hasParams) {
@@ -200,6 +202,7 @@ async function fetchDeviceStatus() {
         master: params.get('master') === null ? true : parseBool(params.get('master')),
         light: params.get('light') === null ? true : parseBool(params.get('light')),
         sound: params.get('sound') === null ? true : parseBool(params.get('sound')),
+        webEmotionRxLocked: false,
       };
     }
   }
@@ -207,12 +210,14 @@ async function fetchDeviceStatus() {
 }
 
 function getSaveButtonIdleState() {
-  const { master, light, sound } = state.devices;
-  const canSave = master && (light || sound);
-  return {
-    disabled: !canSave,
-    label: !canSave ? (master ? 'No devices available' : 'Master offline') : 'Save emotion',
-  };
+  const { master, light, sound, webEmotionRxLocked } = state.devices;
+  const locked = !!webEmotionRxLocked;
+  const canSave = master && (light || sound) && !locked;
+  let label = 'Save emotion';
+  if (!master) label = 'Master offline';
+  else if (locked) label = 'Other home is showing an emotion';
+  else if (!light && !sound) label = 'No devices available';
+  return { disabled: !canSave, label };
 }
 
 function applyDeviceStatus() {
@@ -222,7 +227,7 @@ function applyDeviceStatus() {
   const screenPersonalize = document.getElementById('screen-personalize');
 
   // Master offline: full-page offline screen only (no personalize UI underneath).
-  // Cloud preview/sync stay gated on state.devices.master (syncToPhoton / save).
+  // Cloud preview/sync stay gated on state.devices.master and webEmotionRxLocked (Pair 1 receive lock).
   if (!master) {
     if (screenMasterOffline) {
       screenMasterOffline.hidden = false;
@@ -282,11 +287,30 @@ function applyDeviceStatus() {
     saveBtn.textContent = idle.label;
   }
 
+  const locked = master && !!state.devices.webEmotionRxLocked;
+  const lockNotice = document.getElementById('peer-session-lock-notice');
+  if (lockNotice) {
+    lockNotice.hidden = !locked;
+  }
+  document.querySelectorAll('.emotion-pick').forEach((btn) => {
+    btn.disabled = locked;
+  });
+  const hueSlider = document.getElementById('hue-slider');
+  const soundSlider = document.getElementById('sound-slider');
+  if (hueSlider) hueSlider.disabled = locked;
+  if (soundSlider) soundSlider.disabled = locked;
+  document.body.classList.toggle('web-emotion-rx-locked', locked);
+
+  const sendBtn = document.getElementById('send-emotion');
+  if (sendBtn) {
+    sendBtn.disabled = !master || locked;
+  }
+
   scheduleSliderPlumbLayout();
 }
 
 function syncToPhoton(emotion, personalizing = false) {
-  if (!state.devices.master) return;
+  if (!state.devices.master || state.devices.webEmotionRxLocked) return;
   const errEl = document.getElementById('save-error');
   const s = state[emotion];
   const payload = {
@@ -337,6 +361,7 @@ function init() {
   initEmotionToggle();
   initColorSwitcher();
   initSoundSlider();
+  initSendEmotionButton();
   initSaveButton();
   initSliderPlumbSync();
   applyStateToUI();
@@ -353,6 +378,7 @@ async function initDeviceStatus() {
       master: params.get('master') === null ? true : parseBool(params.get('master')),
       light: params.get('light') === null ? true : parseBool(params.get('light')),
       sound: params.get('sound') === null ? true : parseBool(params.get('sound')),
+      webEmotionRxLocked: false,
     };
   }
   const fetchWithTimeout = () =>
@@ -362,7 +388,7 @@ async function initDeviceStatus() {
     ]);
   await fetchWithTimeout();
   applyDeviceStatus();
-  if (state.devices.master) {
+  if (state.devices.master && !state.devices.webEmotionRxLocked) {
     syncToPhoton('negative', false);
     syncToPhoton('positive', false);
   }
@@ -373,14 +399,24 @@ async function initDeviceStatus() {
     applyDeviceStatus();
   };
 
+  const pollDelayMs = () => (state.devices.webEmotionRxLocked ? 4000 : POLL_INTERVAL_MS);
+
   const startDevicePolling = () => {
     if (devicePollIntervalId !== null) return;
-    devicePollIntervalId = setInterval(pollDeviceStatusOnce, POLL_INTERVAL_MS);
+    const scheduleNext = () => {
+      devicePollIntervalId = setTimeout(async () => {
+        devicePollIntervalId = null;
+        if (document.hidden) return;
+        await pollDeviceStatusOnce();
+        if (!document.hidden) scheduleNext();
+      }, pollDelayMs());
+    };
+    scheduleNext();
   };
 
   const stopDevicePolling = () => {
     if (devicePollIntervalId !== null) {
-      clearInterval(devicePollIntervalId);
+      clearTimeout(devicePollIntervalId);
       devicePollIntervalId = null;
     }
   };
@@ -390,8 +426,10 @@ async function initDeviceStatus() {
     if (document.hidden) {
       stopDevicePolling();
     } else {
-      pollDeviceStatusOnce();
-      startDevicePolling();
+      stopDevicePolling();
+      pollDeviceStatusOnce().then(() => {
+        if (!document.hidden) startDevicePolling();
+      });
     }
   });
 }
@@ -492,6 +530,7 @@ function initEmotionToggle() {
   const buttons = document.querySelectorAll('.emotion-pick');
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
+      if (state.devices.webEmotionRxLocked) return;
       state.emotion = btn.dataset.emotion;
       updateEmotionPickerUI();
       applyStateToUI();
@@ -551,6 +590,70 @@ function initSoundSlider() {
     clearLivePersonalizeDebounce();
     const trackId = stepIndexToTrackId(idx);
     setCurrentState({ selectedTrack: trackId });
+  });
+}
+
+function initSendEmotionButton() {
+  if (getSetupId() !== 2) return;
+  const btn = document.getElementById('send-emotion');
+  const errEl = document.getElementById('send-emotion-error');
+  if (!btn) return;
+
+  function showError(msg) {
+    if (errEl) {
+      errEl.textContent = msg;
+      errEl.hidden = false;
+    }
+  }
+  function clearError() {
+    if (errEl) {
+      errEl.textContent = '';
+      errEl.hidden = true;
+    }
+  }
+
+  btn.addEventListener('click', () => {
+    if (btn.disabled || !state.devices.master || state.devices.webEmotionRxLocked) return;
+    clearError();
+    btn.disabled = true;
+    const idleLabel = btn.textContent;
+    btn.textContent = 'Sending…';
+    const s = state[state.emotion];
+    fetch('/api/photon', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'sendEmotion',
+        setup: getSetupId(),
+        emotion: state.emotion,
+        hue: s.hue,
+        selectedTrack: s.selectedTrack || '',
+      }),
+    })
+      .then(async (r) => {
+        const data = await r.json().catch(() => ({}));
+        return { ok: r.ok, data };
+      })
+      .then(({ ok, data }) => {
+        if (ok && data.sent) {
+          btn.textContent = 'Emotion sent!';
+          clearError();
+        } else {
+          btn.textContent = idleLabel;
+          showError(data.error || 'Could not send emotion. Check that the master is online.');
+        }
+        setTimeout(() => {
+          btn.textContent = idleLabel;
+          btn.disabled = !state.devices.master || !!state.devices.webEmotionRxLocked;
+        }, 3000);
+      })
+      .catch((err) => {
+        btn.textContent = idleLabel;
+        showError(err?.message || 'Network error — check console');
+        setTimeout(() => {
+          btn.disabled = !state.devices.master || !!state.devices.webEmotionRxLocked;
+        }, 3000);
+      });
   });
 }
 
